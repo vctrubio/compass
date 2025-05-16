@@ -37,8 +37,14 @@ export const availabilityWindows = pgTable("availability_windows", {
   id: serial("id").primaryKey(),
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
   endDate: timestamp("end_date", { withTimezone: true }).notNull(),
-  studentId: integer("student_id").notNull().references(() => students.id),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+// Junction table for students and availability windows
+export const studentAvailabilityWindows = pgTable("student_availability_windows", {
+  id: serial("id").primaryKey(),
+  studentId: integer("student_id").notNull().references(() => students.id),
+  availabilityWindowId: integer("availability_window_id").notNull().references(() => availabilityWindows.id),
 });
 
 // Profile tables: students, teachers, admins
@@ -61,6 +67,7 @@ export const teachers = pgTable("teachers", {
   userId: text("user_id"), // For auth system integration
 });
 
+//later be migrated to userAuthTable from auth system
 export const admins = pgTable("admins", {
   id: serial("id").primaryKey(),
   userId: text("user_id").notNull(),
@@ -91,7 +98,6 @@ export const bookings = pgTable("bookings", {
   packageId: integer("package_id").notNull().references(() => packages.id),
   studentId: integer("student_id").notNull().references(() => students.id),
   startDate: timestamp("start_date", { withTimezone: true }).notNull(),
-  comments: text("comments"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
@@ -137,14 +143,22 @@ export const lessonSessions = pgTable("lesson_sessions", {
 
 // Define relationships
 export const studentsRelations = relations(students, ({ many }) => ({
-  availabilityWindows: many(availabilityWindows),
+  availabilityWindows: many(studentAvailabilityWindows),
   bookings: many(bookings), // Direct relation to bookings
 }));
 
-export const availabilityWindowsRelations = relations(availabilityWindows, ({ one }) => ({
+export const availabilityWindowsRelations = relations(availabilityWindows, ({ many }) => ({
+  students: many(studentAvailabilityWindows),
+}));
+
+export const studentAvailabilityWindowsRelations = relations(studentAvailabilityWindows, ({ one }) => ({
   student: one(students, {
-    fields: [availabilityWindows.studentId],
+    fields: [studentAvailabilityWindows.studentId],
     references: [students.id],
+  }),
+  availabilityWindow: one(availabilityWindows, {
+    fields: [studentAvailabilityWindows.availabilityWindowId],
+    references: [availabilityWindows.id],
   }),
 }));
 

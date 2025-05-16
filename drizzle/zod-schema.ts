@@ -11,6 +11,7 @@ import {
   payments,
   postLessons,
   lessons,
+  studentAvailabilityWindows,
 } from "./schema";
 
 // Base schemas
@@ -88,6 +89,32 @@ export const insertLessonSchema = createInsertSchema(lessons, {
 
 export const selectLessonSchema = createSelectSchema(lessons);
 
+// Availability Windows
+export const availabilityWindowSchema = z.object({
+  id: z.number().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  createdAt: z.coerce.date().optional(),
+});
+
+// Student Availability Windows (junction table)
+export const studentAvailabilityWindowSchema = z.object({
+  id: z.number().optional(),
+  studentId: z.number(),
+  availabilityWindowId: z.number(),
+});
+
+// Students
+export const studentSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().min(2).max(100),
+  email: z.string().email().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  languages: z.array(z.enum(["english", "spanish", "french", "german"])),
+  age: z.number().min(1).max(120),
+  userId: z.string().optional().nullable(),
+});
+
 // Type inference
 export type NewStudent = z.infer<typeof insertStudentSchema>;
 export type Student = z.infer<typeof selectStudentSchema>;
@@ -118,3 +145,10 @@ export type PostLesson = z.infer<typeof selectPostLessonSchema>;
 
 export type NewLesson = z.infer<typeof insertLessonSchema>;
 export type Lesson = z.infer<typeof selectLessonSchema>;
+
+export type NewStudentAvailabilityWindow = z.infer<typeof studentAvailabilityWindowSchema>;
+export type StudentAvailabilityWindow = {
+  id: number;
+  studentId: number;
+  availabilityWindowId: number;
+};
