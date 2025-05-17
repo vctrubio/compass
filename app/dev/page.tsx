@@ -1,30 +1,37 @@
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import TestForm from '@/components/forms/testform'
+import { z } from 'zod'
+
+// Define the schema for server-side validation
+const inputSchema = z.string()
+  .min(3, { message: "Text must be at least 3 characters long" })
+  .max(100, { message: "Text must be less than 100 characters" });
 
 export default async function Page() {
   const supabase = await createClient()
   
   // Get data from the test table
-  const { data: notes, error: fetchError } = await supabase.from('test').select()
+  const { data: notes, error: fetchError } = await supabase.from('test').select().order('id', { ascending: false })
   console.log('Current data:', notes)
   console.log('Fetch error:', fetchError)
   
-  // This server action handles the database interaction
+  // Server action with Zod validation
   async function insertData(formData: string) {
     'use server'
     
-    const supabase = await createClient()
-    console.log('Attempting to insert:', { funny: formData })
-    
     try {
+      // Validate the input data
+      const validatedData = inputSchema.parse(formData);
+      
+      const supabase = await createClient()
       const { data, error } = await supabase
         .from('test')
-        .insert([{ funny: formData }])  // Changed from content to funny
-        .select() // Add select to get the inserted data back
+        .insert([{ funny: validatedData }])
+        .select()
       
       if (error) {
-        console.error('Supabase insert error details:', error.message, error.details, error.hint)
+        console.error('Supabase insert error details:', error)
         throw new Error(`Failed to insert data: ${error.message}`)
       }
       
@@ -32,6 +39,11 @@ export default async function Page() {
       revalidatePath('/dev')
       return data
     } catch (e) {
+      if (e instanceof z.ZodError) {
+        // Handle validation error
+        console.error('Validation error:', e.errors);
+        throw new Error(`Validation error: ${e.errors[0].message}`);
+      }
       console.error('Exception during insert operation:', e)
       throw e // Re-throw the error after logging
     }
