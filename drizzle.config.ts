@@ -5,7 +5,7 @@ export default {
   out: './drizzle/migrations',
   driver: 'pg',
   dbCredentials: {
-    // Replace these with your actual database credentials
-    connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/northcompass',
+    connectionString: process.env.DATABASE_URL!,
   },
+  dialect: 'postgresql',
 } satisfies Config;
