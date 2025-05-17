@@ -26,11 +26,7 @@ const languagesEnum = pgEnum("languages", [
   "german",
 ]);
 
-const equipmentTypeEnum = pgEnum("equipment_type", [
-  "kite",
-  "bar",
-  "board",
-]);
+const equipmentTypeEnum = pgEnum("equipment_type", ["kite", "bar", "board"]);
 
 // Date spans table to track availability
 export const availabilityWindows = pgTable("availability_windows", {
@@ -41,30 +37,37 @@ export const availabilityWindows = pgTable("availability_windows", {
 });
 
 // Junction table for students and availability windows
-export const studentAvailabilityWindows = pgTable("student_availability_windows", {
-  id: serial("id").primaryKey(),
-  studentId: integer("student_id").notNull().references(() => students.id),
-  availabilityWindowId: integer("availability_window_id").notNull().references(() => availabilityWindows.id),
-});
+export const studentAvailabilityWindows = pgTable(
+  "student_availability_windows",
+  {
+    id: serial("id").primaryKey(),
+    studentId: integer("student_id")
+      .notNull()
+      .references(() => students.id),
+    availabilityWindowId: integer("availability_window_id")
+      .notNull()
+      .references(() => availabilityWindows.id),
+  }
+);
 
 // Profile tables: students, teachers, admins
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),  // Changed from fullName to name
+  name: text("name").notNull(),
   email: text("email"),
   phone: text("phone"),
   languages: languagesEnum("languages").array().notNull(),
   age: integer("age").notNull(),
-  userId: text("user_id"), // For auth system integration
+  authId: text("user_id"), // For (SUPERBASE) auth system integration
 });
 
 export const teachers = pgTable("teachers", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(),  // Changed from fullName to name
+  name: text("name").notNull(), // Changed from fullName to name
   email: text("email"),
   phone: text("phone"),
   languages: languagesEnum("languages").array().notNull(),
-  userId: text("user_id"), // For auth system integration
+  authId: text("user_id"), // For (SUPERBASE) auth system integration
 });
 
 //later be migrated to userAuthTable from auth system
