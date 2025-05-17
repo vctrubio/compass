@@ -33,7 +33,7 @@ export default function RootLayout({
           <main className="min-h-screen flex flex-col items-center">
             <Navbar />
             {children}
-            <Footer />
+            {/* <Footer /> */}
           </main>
         </ThemeProvider>
       </body>

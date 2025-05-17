@@ -2,7 +2,6 @@ import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
 import TestForm from '@/components/forms/testform'
 import { z } from 'zod'
-
 // Define the schema for server-side validation
 const inputSchema = z.string()
   .min(3, { message: "Text must be at least 3 characters long" })

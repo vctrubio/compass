@@ -11,6 +11,7 @@ import {
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
 import { Search, Filter, SortDesc, Plus, ChevronDown } from "lucide-react";
+import { DbProvider } from "@/utils/context/db-context";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -119,13 +120,15 @@ const AdminHeader = () => {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="flex h-screen w-full">
-      <main className="w-full p-4">
-        <AdminHeader />
-        <div className="mt-8">
-          {children}
-        </div>
-      </main>
-    </div>
+    <DbProvider>
+      <div className="flex h-screen w-full">
+        <main className="w-full p-4">
+          {/* <AdminHeader /> */}
+          <div className="mt-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    </DbProvider>
   );
 }
