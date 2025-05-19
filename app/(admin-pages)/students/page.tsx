@@ -4,7 +4,7 @@ import { GenericTable } from "@/rails/view/table/GenericTable";
 import { GenericTableProps } from "@/rails/view/table/GenericTable"; // Import the type
 
 export default function StudentsPage() {
-    const { tables } = useAdminContext();
+  const { tables } = useAdminContext();
 
   const data = tables.students?.data || [];
   const fields = tables.students?.fields || [];

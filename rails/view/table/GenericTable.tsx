@@ -1,4 +1,6 @@
 import { TableField } from "@/rails/types";
+import { cn } from "@/lib/twMerge";
+import { GenericRow } from "./GenericRow";
 
 export interface GenericTableProps {
     fields: TableField[];
@@ -6,16 +8,28 @@ export interface GenericTableProps {
 }
 
 export function GenericTable({ table }: { table: GenericTableProps }) {
-    // Early return if table is undefined
     if (!table || !table.fields || !table.data) {
-        return <div>No table data available</div>;
+        return <div className="text-sm text-muted-foreground p-4 rounded-md bg-muted/10">No table data available</div>;
+    }
+
+    if (table.data.length === 0) {
+        return (
+            <div className="text-center p-8 border rounded-md bg-background">
+                <p className="text-muted-foreground">No data to display</p>
+            </div>
+        );
     }
 
     const TableHeader = () => (
-        <thead>
+        <thead className="bg-muted/50">
             <tr>
                 {table.fields.map((field, index) => (
-                    <th key={index}>{field.name}</th>
+                    <th
+                        key={index}
+                        className="text-left font-medium text-muted-foreground p-3 text-sm"
+                    >
+                        {field.name}
+                    </th>
                 ))}
             </tr>
         </thead>
@@ -24,19 +38,22 @@ export function GenericTable({ table }: { table: GenericTableProps }) {
     const TableBody = () => (
         <tbody>
             {table.data.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                    {table.fields.map((field, colIndex) => (
-                        <td key={colIndex}>{row[field.name]}</td>
-                    ))}
-                </tr>
+                <GenericRow
+                    key={rowIndex}
+                    row={row}
+                    fields={table.fields}
+                    rowIndex={rowIndex}
+                />
             ))}
         </tbody>
     );
 
     return (
-        <table>
-            <TableHeader />
-            <TableBody />
-        </table>
+        <div className="w-full overflow-auto">
+            <table className="w-full table-auto border-collapse border rounded-md">
+                <TableHeader />
+                <TableBody />
+            </table>
+        </div>
     );
 }
