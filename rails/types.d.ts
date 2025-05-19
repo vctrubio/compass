@@ -31,7 +31,7 @@ export interface TableEntity {
     put: (data: any) => Promise<any>;
     updateId: (id: string | number, data: any) => Promise<any>;
     deleteId: (id: string | number) => Promise<any>;
-  };
+  } | undefined;
   relationship: string[];
   desc: string;
   filterBy?: FilterOption[];
@@ -40,12 +40,12 @@ export interface TableEntity {
 
 declare global {
   interface Window {
-    test1: string;
-    isadmin: boolean;
-    user: User | null;
-    isLoading: boolean;
-    tableData: Record<string, any[]>;
-    tss: string[];
+    // test1: string;
+    // isadmin: boolean;
+    // user: User | null;
+    // isLoading: boolean;
+    // tableData: Record<string, any[]>;
+    // tss: string[];
   }
 }
 

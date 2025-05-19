@@ -74,55 +74,34 @@ export const initializeTables = async (
   // Process each table
   for (const tableName of tablesToFetch) {
     console.log(`🔄 DB_FETCH: Processing table: ${tableName}`);
+    const tableDictInfo = dbTableDictionary[tableName];
+    let tableData = null;
+
     try {
-      // Fetch data for this table
-      const tableData = await fetchTableDataRaw(client, tableName);
-
-      // Get dictionary information for this table if available
-      const tableDictInfo = dbTableDictionary[tableName];
-
-      // Create the table entity using dictionary data if available
-      tables[tableName] = {
-        name: tableName,
-        fields:
-          tableDictInfo?.fields ||
-          (tableData && tableData.length > 0
-            ? Object.keys(tableData[0]).map((key) => ({
-                name: key,
-                type: typeof tableData[0][key],
-                required: key === "id",
-                isPrimaryKey: key === "id",
-              }))
-            : [
-                {
-                  name: "id",
-                  type: "number",
-                  required: true,
-                  isPrimaryKey: true,
-                },
-              ]),
-        data: tableData || [],
-        api: defaultApi,
-        relationship: tableDictInfo?.relationship || [],
-        desc: tableDictInfo?.desc || `Table for ${tableName}`,
-      };
-      console.log(`✅ DB_FETCH: Successfully initialized table: ${tableName}`);
+      tableData = await fetchTableDataRaw(client, tableName);
     } catch (error) {
-      console.error(`❌ DB_FETCH: Error initializing table ${tableName}:`, error);
-
-      // Add a placeholder entry even if there was an error
-      // Use dictionary information if available
-      const tableDictInfo = dbTableDictionary[tableName];
-
-      tables[tableName] = {
-        name: tableName,
-        fields: tableDictInfo?.fields,
-        data: [],
-        api: defaultApi,
-        relationship: tableDictInfo?.relationship || [],
-        desc: tableDictInfo?.desc || `Error loading table ${tableName}`,
-      };
+      console.error(`❌ DB_FETCH: Error fetching data for table ${tableName}:`, error);
     }
+
+    // Create the table entity using available data
+    tables[tableName] = {
+      name: tableName,
+      fields: tableDictInfo?.fields ||
+        (tableData && tableData.length > 0
+          ? Object.keys(tableData[0]).map((key) => ({
+            name: key,
+            type: typeof tableData[0][key],
+            required: false,
+            isPrimaryKey: false,
+          }))
+          : []),
+      data: tableData || [],
+      api: defaultApi,
+      relationship: tableDictInfo?.relationship || [],
+      desc: tableDictInfo?.desc || `Table for ${tableName}`,
+    };
+
+    console.log(`✅ DB_FETCH: Successfully initialized table: ${tableName}`);
   }
 
   console.log(`✅ DB_FETCH: Completed initialization of ${Object.keys(tables).length} tables`);
