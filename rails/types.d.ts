@@ -12,7 +12,7 @@ export interface FilterOption {
   field: string;
   label: string;
   multiSelect?: boolean;
-  options?: Array<{value: string | number, label: string}>;
+  options?: Array<{value: string | number | boolean, label: string}>;
 }
 
 export interface SortOption {

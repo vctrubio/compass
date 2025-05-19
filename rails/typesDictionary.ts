@@ -45,7 +45,18 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'authId', type: 'string', required: false, isPrimaryKey: false }
     ],
     relationship: ["lessons"],
-    desc: "Teachers table - contains teacher profiles and their information"
+    desc: "Teachers table - contains teacher profiles and their information",
+    filterBy: [
+      { field: 'languages', label: 'Language', multiSelect: true, options: [
+        { value: 'english', label: 'English' },
+        { value: 'spanish', label: 'Spanish' },
+        { value: 'french', label: 'French' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'name', label: 'Name (A-Z)', direction: 'asc' },
+      { field: 'name', label: 'Name (Z-A)', direction: 'desc' }
+    ]
   },
   
   equipment: {
@@ -57,7 +68,20 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'size', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: [],
-    desc: "Equipment table - contains all kite equipment (kites, bars, boards)"
+    desc: "Equipment table - contains all kite equipment (kites, bars, boards)",
+    filterBy: [
+      { field: 'type', label: 'Type', options: [
+        { value: 'kite', label: 'Kite' },
+        { value: 'board', label: 'Board' },
+        { value: 'bar', label: 'Control Bar' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'type', label: 'Type (A-Z)', direction: 'asc' },
+      { field: 'model', label: 'Model (A-Z)', direction: 'asc' },
+      { field: 'size', label: 'Size (Small to Large)', direction: 'asc' },
+      { field: 'size', label: 'Size (Large to Small)', direction: 'desc' }
+    ]
   },
   
   packages: {
@@ -71,7 +95,26 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
     ],
     relationship: ["bookings"],
-    desc: "Packages table - contains lesson package offerings and pricing"
+    desc: "Packages table - contains lesson package offerings and pricing",
+    filterBy: [
+      { field: 'hours', label: 'Duration', options: [
+        { value: 1, label: '1 Hour' },
+        { value: 2, label: '2 Hours' },
+        { value: 3, label: '3+ Hours' }
+      ]},
+      { field: 'capacity', label: 'Group Size', options: [
+        { value: 1, label: 'Individual' },
+        { value: 2, label: 'Pair' },
+        { value: 3, label: 'Small Group (3-5)' },
+        { value: 6, label: 'Large Group (6+)' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'price', label: 'Price (Low to High)', direction: 'asc' },
+      { field: 'price', label: 'Price (High to Low)', direction: 'desc' },
+      { field: 'hours', label: 'Duration (Short to Long)', direction: 'asc' },
+      { field: 'hours', label: 'Duration (Long to Short)', direction: 'desc' }
+    ]
   },
   
   bookings: {
@@ -84,7 +127,21 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
     ],
     relationship: ["lessons", "packages", "students"],
-    desc: "Bookings table - contains student bookings for lesson packages"
+    desc: "Bookings table - contains student bookings for lesson packages",
+    filterBy: [
+      { field: 'startDate', label: 'Time Period', options: [
+        { value: 'today', label: 'Today' },
+        { value: 'this-week', label: 'This Week' },
+        { value: 'this-month', label: 'This Month' },
+        { value: 'past', label: 'Past Bookings' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'startDate', label: 'Date (Newest First)', direction: 'desc' },
+      { field: 'startDate', label: 'Date (Oldest First)', direction: 'asc' },
+      { field: 'createdAt', label: 'Booking Date (Newest First)', direction: 'desc' },
+      { field: 'createdAt', label: 'Booking Date (Oldest First)', direction: 'asc' }
+    ]
   },
   
   sessions: {
@@ -96,9 +153,27 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'duration', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessonSessions"],
-    desc: "Sessions table - contains individual learning sessions with equipment"
+    desc: "Sessions table - contains individual learning sessions with equipment",
+    filterBy: [
+      { field: 'duration', label: 'Duration', options: [
+        { value: 60, label: '1 Hour' },
+        { value: 120, label: '2 Hours' },
+        { value: 180, label: '3+ Hours' }
+      ]},
+      { field: 'startTime', label: 'Time', options: [
+        { value: 'morning', label: 'Morning (Before 12pm)' },
+        { value: 'afternoon', label: 'Afternoon (12-4pm)' },
+        { value: 'evening', label: 'Evening (After 4pm)' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'startTime', label: 'Start Time (Newest First)', direction: 'desc' },
+      { field: 'startTime', label: 'Start Time (Oldest First)', direction: 'asc' },
+      { field: 'duration', label: 'Duration (Short to Long)', direction: 'asc' },
+      { field: 'duration', label: 'Duration (Long to Short)', direction: 'desc' }
+    ]
   },
-  
+
   payments: {
     name: "payments",
     fields: [
@@ -108,7 +183,19 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'amount', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessons"],
-    desc: "Payments table - contains payment records for lessons"
+    desc: "Payments table - contains payment records for lessons",
+    filterBy: [
+      { field: 'cash', label: 'Payment Type', options: [
+        { value: 'true', label: 'Cash' },
+        { value: 'false', label: 'Card/Digital' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'createdDate', label: 'Date (Newest First)', direction: 'desc' },
+      { field: 'createdDate', label: 'Date (Oldest First)', direction: 'asc' },
+      { field: 'amount', label: 'Amount (High to Low)', direction: 'desc' },
+      { field: 'amount', label: 'Amount (Low to High)', direction: 'asc' }
+    ]
   },
   
   postLessons: {
@@ -118,7 +205,14 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'studentConfirmation', type: 'boolean', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessons"],
-    desc: "Post-lessons table - contains post-lesson feedback and confirmations"
+    desc: "Post-lessons table - contains post-lesson feedback and confirmations",
+    filterBy: [
+      { field: 'studentConfirmation', label: 'Confirmation', options: [
+        { value: 'true', label: 'Confirmed' },
+        { value: 'false', label: 'Not Confirmed' }
+      ]}
+    ],
+    sortBy: []
   },
   
   availabilityWindows: {
@@ -130,7 +224,17 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
     ],
     relationship: ["studentAvailabilityWindows"],
-    desc: "Availability windows table - contains time periods for scheduling"
+    desc: "Availability windows table - contains time periods for scheduling",
+    filterBy: [
+      { field: 'startDate', label: 'Period', options: [
+        { value: 'upcoming', label: 'Upcoming' },
+        { value: 'past', label: 'Past' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'startDate', label: 'Start Date (Newest First)', direction: 'desc' },
+      { field: 'startDate', label: 'Start Date (Oldest First)', direction: 'asc' }
+    ]
   },
   
   studentAvailabilityWindows: {
@@ -141,7 +245,9 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'availabilityWindowId', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["students", "availabilityWindows"],
-    desc: "Student availability windows table - links students to their availability"
+    desc: "Student availability windows table - links students to their availability",
+    filterBy: [],
+    sortBy: []
   },
   
   lessons: {
@@ -156,7 +262,19 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
     ],
     relationship: ["teachers", "bookings", "payments", "postLessons", "lessonSessions"],
-    desc: "Lessons table - contains lesson records connecting teachers, bookings and sessions"
+    desc: "Lessons table - contains lesson records connecting teachers, bookings and sessions",
+    filterBy: [
+      { field: 'status', label: 'Status', options: [
+        { value: 'scheduled', label: 'Scheduled' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'cancelled', label: 'Cancelled' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'createdAt', label: 'Created Date (Newest First)', direction: 'desc' },
+      { field: 'createdAt', label: 'Created Date (Oldest First)', direction: 'asc' },
+      { field: 'status', label: 'Status (A-Z)', direction: 'asc' }
+    ]
   },
   
   lessonSessions: {
@@ -167,7 +285,9 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'sessionId', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessons", "sessions"],
-    desc: "Lesson sessions table - links lessons to their individual sessions"
+    desc: "Lesson sessions table - links lessons to their individual sessions",
+    filterBy: [],
+    sortBy: []
   },
   
   admins: {
@@ -178,6 +298,16 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'role', type: 'string', required: true, isPrimaryKey: false }
     ],
     relationship: [],
-    desc: "Admins table - contains administrator user information"
+    desc: "Admins table - contains administrator user information",
+    filterBy: [
+      { field: 'role', label: 'Role', options: [
+        { value: 'admin', label: 'Administrator' },
+        { value: 'manager', label: 'Manager' },
+        { value: 'viewer', label: 'Viewer' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'role', label: 'Role (A-Z)', direction: 'asc' }
+    ]
   }
 };
