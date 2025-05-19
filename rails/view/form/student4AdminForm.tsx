@@ -10,9 +10,8 @@ import { FormStructure, FormProps } from './FormStructure';
 // Form Sections
 function PersonalInfoSection({ register, errors }: { register: any; errors: any }) {
   return (
-    <div className="lg:w-1/3 py-6 lg:px-6">
       <FormStructure.Section title="Personal Information">
-        <div className="flex-1">
+        <div className="flex gap-3">
           <FormStructure.Field label="Name *" id="name" error={errors.name?.message}>
             <Input
               id="name"
@@ -25,9 +24,7 @@ function PersonalInfoSection({ register, errors }: { register: any; errors: any 
               className="w-full"
             />
           </FormStructure.Field>
-        </div>
-        
-        <div className="flex-1">
+
           <FormStructure.Field label="Age *" id="age" error={errors.age?.message}>
             <Input
               id="age"
@@ -43,15 +40,13 @@ function PersonalInfoSection({ register, errors }: { register: any; errors: any 
           </FormStructure.Field>
         </div>
       </FormStructure.Section>
-    </div>
   );
 }
 
 function ContactInfoSection({ register, errors }: { register: any; errors: any }) {
   return (
-    <div className="lg:w-1/3 py-6 lg:px-6">
       <FormStructure.Section title="Contact Information">
-        <div className="flex-1">
+        <div className="flex gap-3">
           <FormStructure.Field label="Email Address" id="email" error={errors.email?.message}>
             <Input
               id="email"
@@ -61,9 +56,7 @@ function ContactInfoSection({ register, errors }: { register: any; errors: any }
               className="w-full"
             />
           </FormStructure.Field>
-        </div>
 
-        <div className="flex-1">
           <FormStructure.Field label="Phone Number" id="phone" error={errors.phone?.message}>
             <Input
               id="phone"
@@ -74,17 +67,15 @@ function ContactInfoSection({ register, errors }: { register: any; errors: any }
           </FormStructure.Field>
         </div>
       </FormStructure.Section>
-    </div>
   );
 }
 
 function LanguagesSection({ control, errors }: { control: any; errors: any }) {
   return (
-    <div className="lg:w-1/3 py-6 lg:px-6">
       <FormStructure.Section title="Languages *">
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 p-3">
           {Array.from(availableLanguages).map((language) => (
-            <div key={language} className="flex items-center space-x-2">
+            <div key={language} className="flex items-center space-x-2 mt-4">
               <Controller
                 name="languages"
                 control={control}
@@ -105,7 +96,7 @@ function LanguagesSection({ control, errors }: { control: any; errors: any }) {
               />
               <label
                 htmlFor={`lang-${language}`}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize"
+                className=""
               >
                 {language}
               </label>
@@ -116,7 +107,6 @@ function LanguagesSection({ control, errors }: { control: any; errors: any }) {
           <p className="text-sm text-destructive">{errors.languages.message}</p>
         )}
       </FormStructure.Section>
-    </div>
   );
 }
 
@@ -132,11 +122,11 @@ export function Student4AdminForm({ onSubmit, isOpen, onClose }: { onSubmit: (da
       resolver={zodResolver(studentSchema)}
     >
       {({ register, control, errors }) => (
-        <>
+        <div className="flex flex-wrap gap-2">
           <PersonalInfoSection register={register} errors={errors} />
           <ContactInfoSection register={register} errors={errors} />
           <LanguagesSection control={control} errors={errors} />
-        </>
+        </div>
       )}
     </FormStructure.Form>
   );

@@ -2,19 +2,17 @@
 import React, { useState, useEffect, useCallback, ReactNode } from "react";
 import { ControllerBar } from "./ControllerBar";
 import { GenericTable } from "@/rails/view/table/GenericTable";
-import { TableField, FilterOption, SortOption, TableEntity } from "@/rails/types";
+import { SortOption, TableEntity } from "@/rails/types";
 import { dbTableDictionary } from "@/rails/typesDictionary";
-import { GenericTableProps } from "@/rails/view/table/GenericTable";
-import { Checkbox } from "@/components/ui/checkbox"; 
 
 export interface FilterValue {
   field: string;
-  value: string | number | Array<string | number>;
+  value: string | number | boolean | Array<string | number | boolean>;
   isMultiSelect?: boolean;
 }
 
 interface FormProps {
-  onSubmit: (data: any) => void;
+  onSubmit: (data: any) => Promise<boolean>;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -26,18 +24,16 @@ export interface ControllerContentProps {
   searchFields?: string[];
   showAddButton?: boolean;
   children?: ReactNode;
-  onAdd?: () => void;
   addForm?: React.ComponentType<FormProps>;
 }
 
-export function ControllerContent({ 
-  title, 
-  tableName, 
-  tableData, 
+export function ControllerContent({
+  title,
+  tableName,
+  tableData,
   searchFields = ['name', 'first_name', 'last_name'],
   showAddButton = true,
   children,
-  onAdd,
   addForm
 }: ControllerContentProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,8 +42,7 @@ export function ControllerContent({
   const [activeFilters, setActiveFilters] = useState<FilterValue[]>([]);
   const [activeSort, setActiveSort] = useState<SortOption | undefined>(undefined);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [keepFormOpen, setKeepFormOpen] = useState(false);
-  
+
   // Get fields and options from the table data or fallback to dictionary
   const fields = tableData?.fields || dbTableDictionary[tableName]?.fields || [];
   const filterOptions = tableData?.filterBy || dbTableDictionary[tableName]?.filterBy || [];
@@ -67,7 +62,7 @@ export function ControllerContent({
   // Apply all filters and sorting
   const applyFiltersAndSort = useCallback(() => {
     if (!allData.length) return [];
-    
+
     let result = [...allData];
 
     // Apply search filter
@@ -116,7 +111,7 @@ export function ControllerContent({
             if (Array.isArray(item[filter.field])) {
               if (Array.isArray(filter.value)) {
                 // Multiple value selection (OR logic)
-                return (filter.value as Array<string | number>).some(val => 
+                return (filter.value as Array<string | number>).some(val =>
                   item[filter.field].includes(val)
                 );
               } else {
@@ -141,25 +136,25 @@ export function ControllerContent({
       result.sort((a, b) => {
         const aValue = a[activeSort.field];
         const bValue = b[activeSort.field];
-        
+
         // Handle string comparison
         if (typeof aValue === 'string' && typeof bValue === 'string') {
-          return activeSort.direction === 'asc' 
+          return activeSort.direction === 'asc'
             ? aValue.localeCompare(bValue)
             : bValue.localeCompare(aValue);
         }
-        
+
         // Handle number comparison
         if (typeof aValue === 'number' && typeof bValue === 'number') {
-          return activeSort.direction === 'asc' 
-            ? (aValue - bValue) 
+          return activeSort.direction === 'asc'
+            ? (aValue - bValue)
             : (bValue - aValue);
         }
-        
+
         // Handle undefined or null values
         if (aValue === undefined || aValue === null) return 1;
         if (bValue === undefined || bValue === null) return -1;
-        
+
         // Default fallback
         return 0;
       });
@@ -179,7 +174,7 @@ export function ControllerContent({
     setActiveFilters(prev => {
       // Check if this field is already filtered
       const existingIndex = prev.findIndex(f => f.field === filter.field);
-      
+
       if (existingIndex >= 0) {
         // Replace existing filter
         const newFilters = [...prev];
@@ -198,7 +193,7 @@ export function ControllerContent({
   };
 
   // Handle sort changes
-  const handleSortChange = (sort: SortOption) => {
+  const handleSortChange = (sort: SortOption | undefined) => {
     setActiveSort(sort);
   };
 
@@ -211,16 +206,8 @@ export function ControllerContent({
 
   // Handle adding a new record
   const handleAddNew = () => {
-    if (onAdd) {
-      onAdd();
-      return;
-    }
-    
     if (addForm) {
       setShowAddForm(!showAddForm);
-    } else {
-      console.log(`Add new ${title}`);
-      // Default implementation could be added here
     }
   };
 
@@ -237,19 +224,13 @@ export function ControllerContent({
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [showAddForm]); // Re-run when showAddForm changes
 
-  const tableProps: GenericTableProps = {
-    fields,
-    data: filteredData
-  };
-
   return (
     <div className="space-y-6">
-      {/* Controller UI with search, filter, sort */}
       <ControllerBar
         title={displayTitle}
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder={`Search ${title.toLowerCase()}...`}
+        searchPlaceholder={`Search by ${searchFields.join(", ")}...`}
         filterOptions={filterOptions}
         sortOptions={sortOptions}
         onFilterChange={handleFilterChange}
@@ -263,25 +244,39 @@ export function ControllerContent({
         showAddButton={showAddButton}
         addButtonText={showAddForm ? `Close ${title}` : `Add ${title}`}
       />
-      
+
       {/* Add Form when showing */}
       {addForm && showAddForm && (
         <div className="mb-4">
           {React.createElement(addForm, {
-            onSubmit: (data: any) => {
-              return Promise.resolve(true);
+            onSubmit: async (data: any) => {
+              try {
+                if (!tableData?.api?.put) {
+                  throw new Error("Table API not properly configured");
+                }
+                const result = await tableData.api.put(data);
+                if (result) {
+                  // setAllData(prev => [...prev, result]);
+                  setShowAddForm(false);
+                  return true;
+                }
+                return false;
+              } catch (err) {
+                console.error("Error adding item:", err);
+                return false;
+              }
             },
             isOpen: true,
             onClose: () => setShowAddForm(false)
           })}
         </div>
       )}
-      
+
       {/* Custom content if provided */}
       {children}
-      
+
       {/* Default table if no custom content is provided */}
-      {!children && <GenericTable table={tableProps} />}
+      {!children && <GenericTable table={{ fields, data: filteredData }} />}
     </div>
   );
 }

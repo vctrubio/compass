@@ -54,33 +54,39 @@ export const FormStructure = {
     </div>
   ),
 
-  Form: <T extends FieldValues>({ 
-    onSubmit, 
-    onCancel, 
-    title, 
-    isOpen, 
-    defaultValues, 
-    resolver, 
+  Form: function FormComponent<T extends FieldValues>({
+    onSubmit,
+    onCancel,
+    title,
+    isOpen,
+    defaultValues,
+    resolver,
     mode = "onChange",
-    children 
-  }: FormProps<T> & { children: (props: { register: any; control: any; errors: any; }) => React.ReactNode }) => {
+    children
+  }: FormProps<T> & { children: (props: { register: any; control: any; errors: any; }) => React.ReactNode }) {
     const [keepFormOpen, setKeepFormOpen] = React.useState(false);
     const [submitError, setSubmitError] = React.useState<string | null>(null);
-    
+    const formRef = React.useRef<HTMLFormElement>(null);
+
     const { register, handleSubmit, control, formState: { errors }, reset } = useForm<T>({
-      defaultValues,
+      defaultValues: defaultValues as any,
       resolver,
       mode
     });
 
-    const onFormSubmit: SubmitHandler<T> = async (data) => {
+    const onFormSubmit = async (data: T) => {
       setSubmitError(null);
       try {
         const success = await onSubmit(data);
         if (success) {
-          reset(defaultValues as T);
+          reset(defaultValues as any);
           if (!keepFormOpen) {
             onCancel();
+          } else {
+            setTimeout(() => {
+              const firstInput = formRef.current?.querySelector('input, textarea, select') as HTMLElement;
+              firstInput?.focus();
+            }, 0);
           }
         }
       } catch (error) {
@@ -88,17 +94,42 @@ export const FormStructure = {
       }
     };
 
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey && isOpen) {
+          const activeElement = document.activeElement;
+          const isTextArea = activeElement instanceof HTMLTextAreaElement;
+          
+          if (!isTextArea) {
+            const isValid = Object.keys(errors).length === 0;
+            if (isValid) {
+              e.preventDefault();
+              const submitWithTypes = handleSubmit((data) => onFormSubmit(data as T));
+              submitWithTypes();
+            } else {
+              e.preventDefault();
+              setSubmitError('Please check the form for errors');
+            }
+          }
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }, [isOpen, errors, handleSubmit, onFormSubmit]);
+
     const onError = (errors: any) => {
-      console.error('Form validation errors:', errors);
       setSubmitError('Please check the form for errors');
     };
 
     if (!isOpen) return null;
 
     return (
-      <form onSubmit={handleSubmit(onFormSubmit, onError)} className="space-y-6">
+      <form ref={formRef} onSubmit={handleSubmit((data) => onFormSubmit(data as T), onError)}>
         <FormStructure.Header title={title} onClose={onCancel} />
-        
+
         <div className="flex flex-col lg:flex-row">
           {children({ register, control, errors })}
         </div>
@@ -114,7 +145,7 @@ export const FormStructure = {
             <Checkbox
               id="keepFormOpen"
               checked={keepFormOpen}
-              onCheckedChange={(checked) => setKeepFormOpen(checked as boolean)}
+              onCheckedChange={(checked) => setKeepFormOpen(!!checked)}
             />
             <label
               htmlFor="keepFormOpen"
@@ -135,4 +166,4 @@ export const FormStructure = {
       </form>
     );
   }
-}; 
+};

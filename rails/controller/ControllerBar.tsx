@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface FilterValueType {
     field: string;
-    value: string | number | Array<string | number>;
+    value: string | number | boolean | Array<string | number | boolean>;
     isMultiSelect?: boolean;
 }
 
@@ -61,8 +61,8 @@ export function ControllerBar({
         return option ? `${filterOption.label}: ${option.label}` : `${filterOption.label}: ${value}`;
     };
     return (
-        <div className="space-y-6">
-            {/* First row - Title, Search and Status */}
+        <div className="space-y-4">
+            {/* First row - Search and Status */}
             <div className="flex items-center gap-4">
                 <div className="flex-grow">
                     <SearchBar
@@ -72,28 +72,30 @@ export function ControllerBar({
                     />
                 </div>
 
-                <div className="flex gap-3">
-                    {totalItems !== undefined && (
-                        <div className="border border-muted/30 bg-secondary/10 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center whitespace-nowrap shadow-sm">
-                            {totalItems} items
-                        </div>
-                    )}
-                </div>
+                {totalItems !== undefined && (
+                    <div className="border border-muted/30 bg-secondary/10 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center whitespace-nowrap shadow-sm">
+                        {totalItems} items
+                    </div>
+                )}
             </div>
 
             {/* Second row - Filters, Sort, Add */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <FilterSortBar
-                    filterOptions={filterOptions}
-                    sortOptions={sortOptions}
-                    onFilterChange={onFilterChange}
-                    onSortChange={onSortChange}
-                    onFilterRemove={onFilterRemove}
-                    activeFilters={activeFilters}
-                    activeSort={activeSort}
-                />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                {/* Left side - Filter and Sort */}
+                <div className="flex flex-wrap items-center gap-3">
+                    <FilterSortBar
+                        filterOptions={filterOptions}
+                        sortOptions={sortOptions}
+                        onFilterChange={onFilterChange}
+                        onSortChange={onSortChange}
+                        onFilterRemove={onFilterRemove}
+                        activeFilters={activeFilters}
+                        activeSort={activeSort}
+                    />
+                </div>
 
-                <div className="ml-auto flex items-center gap-2">
+                {/* Right side - Reset and Add */}
+                <div className="flex items-center gap-2 ml-auto">
                     {hasActiveFiltersOrSort && onResetFilters && (
                         <Button 
                             variant="outline" 

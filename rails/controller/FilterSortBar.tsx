@@ -89,7 +89,12 @@ export function FilterSortBar({
   // Handle sort selection
   const handleSortSelect = (sortOption: SortOption) => {
     if (onSortChange) {
-      onSortChange(sortOption);
+      // If clicking the same sort option that's already active, deselect it
+      if (activeSort?.field === sortOption.field && activeSort?.direction === sortOption.direction) {
+        onSortChange(undefined);
+      } else {
+        onSortChange(sortOption);
+      }
     }
   };
   
@@ -241,9 +246,14 @@ export function FilterSortBar({
         
         {/* Active sort display */}
         {activeSort && (
-          <Badge variant="secondary" className="flex items-center gap-1 py-1 px-3">
+          <Badge 
+            variant="secondary" 
+            className="flex items-center gap-1 py-1 px-3 cursor-pointer hover:bg-destructive/10"
+            onClick={() => onSortChange?.(undefined)}
+          >
             <SortDesc className="h-3 w-3" />
             {activeSort.label}
+            <X className="h-3 w-3 ml-1" />
           </Badge>
         )}
       </div>
