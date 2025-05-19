@@ -2,6 +2,7 @@
 import { useAdminContext } from "@/rails/provider/admin-context-provider";
 import { ControllerContent } from "@/rails/controller/ControllerContent";
 import { dbTableDictionary } from "@/rails/typesDictionary";
+import { Student4AdminForm } from "@/rails/view/form/student4AdminForm";
 
 export default function StudentsPage() {
   const { tables } = useAdminContext();
@@ -38,6 +39,7 @@ export default function StudentsPage() {
       tableName="students"
       tableData={tableData}
       searchFields={["name", "email", "first_name", "last_name"]}
+      addForm={Student4AdminForm}
     />
   );
 }

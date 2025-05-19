@@ -1,15 +1,22 @@
 'use client';
-import { useState, useEffect, useCallback, ReactNode } from "react";
+import React, { useState, useEffect, useCallback, ReactNode } from "react";
 import { ControllerBar } from "./ControllerBar";
 import { GenericTable } from "@/rails/view/table/GenericTable";
 import { TableField, FilterOption, SortOption, TableEntity } from "@/rails/types";
 import { dbTableDictionary } from "@/rails/typesDictionary";
-import { GenericTableProps } from "@/rails/view/table/GenericTable"; 
+import { GenericTableProps } from "@/rails/view/table/GenericTable";
+import { Checkbox } from "@/components/ui/checkbox"; 
 
 export interface FilterValue {
   field: string;
   value: string | number | Array<string | number>;
   isMultiSelect?: boolean;
+}
+
+interface FormProps {
+  onSubmit: (data: any) => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export interface ControllerContentProps {
@@ -20,6 +27,7 @@ export interface ControllerContentProps {
   showAddButton?: boolean;
   children?: ReactNode;
   onAdd?: () => void;
+  addForm?: React.ComponentType<FormProps>;
 }
 
 export function ControllerContent({ 
@@ -29,13 +37,16 @@ export function ControllerContent({
   searchFields = ['name', 'first_name', 'last_name'],
   showAddButton = true,
   children,
-  onAdd
+  onAdd,
+  addForm
 }: ControllerContentProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [allData, setAllData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [activeFilters, setActiveFilters] = useState<FilterValue[]>([]);
   const [activeSort, setActiveSort] = useState<SortOption | undefined>(undefined);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [keepFormOpen, setKeepFormOpen] = useState(false);
   
   // Get fields and options from the table data or fallback to dictionary
   const fields = tableData?.fields || dbTableDictionary[tableName]?.fields || [];
@@ -202,6 +213,11 @@ export function ControllerContent({
   const handleAddNew = () => {
     if (onAdd) {
       onAdd();
+      return;
+    }
+    
+    if (addForm) {
+      setShowAddForm(!showAddForm);
     } else {
       console.log(`Add new ${title}`);
       // Default implementation could be added here
@@ -211,6 +227,40 @@ export function ControllerContent({
   const tableProps: GenericTableProps = {
     fields,
     data: filteredData
+  };
+
+  // Handle form submission
+  const handleFormSubmit = (data: any) => {
+    console.log('Form submitted:', data);
+    // Here you would typically add the new record to your data
+    if (tableData?.api.put) {
+      tableData.api.put(data)
+        .then((result) => {
+          console.log('Record added:', result);
+          
+          // For demo purposes, let's add the item to the local data
+          // In a real application, you'd wait for the API call to complete
+          const newItem = { ...data, id: Date.now() }; // Generate temp ID
+          setAllData(prev => [newItem, ...prev]);
+          
+          // Only close the form if keep open is not checked
+          if (!keepFormOpen) {
+            setShowAddForm(false);
+          }
+        })
+        .catch(error => {
+          console.error('Error adding record:', error);
+        });
+    } else {
+      // Fallback if no API is provided
+      const newItem = { ...data, id: Date.now() }; // Generate temp ID
+      setAllData(prev => [newItem, ...prev]);
+      
+      // Only close the form if keep open is not checked
+      if (!keepFormOpen) {
+        setShowAddForm(false);
+      }
+    }
   };
 
   return (
@@ -234,6 +284,34 @@ export function ControllerContent({
         showAddButton={showAddButton}
         addButtonText={`Add ${title}`}
       />
+      
+      {/* Add Form when showing */}
+      {addForm && showAddForm && (
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="keepFormOpen"
+                checked={keepFormOpen}
+                onCheckedChange={() => setKeepFormOpen(!keepFormOpen)}
+              />
+              <label
+                htmlFor="keepFormOpen"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Keep form open after submission
+              </label>
+            </div>
+          </div>
+          
+          {/* Render the form with props */}
+          {React.createElement(addForm, {
+            onSubmit: handleFormSubmit,
+            isOpen: showAddForm,
+            onClose: () => setShowAddForm(false)
+          })}
+        </div>
+      )}
       
       {/* Custom content if provided */}
       {children}
