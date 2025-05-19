@@ -3,6 +3,8 @@ import React from 'react';
 import AdminProvider from "@/rails/provider/admin-context-provider";
 import AdminHeader from "@/components/admin/AdminHeader";
 import { NavAdmin } from '@/components/navigations/NavAdmin';
+import { DashboardBanner } from '@/components/admin/DashboardBanner';
+
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
@@ -15,7 +17,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* <AdminHeader /> */}
           <NavAdmin />
           <div className="mt-8">
-            {children}
+            <DashboardBanner />
+            <div className="mt-6">
+              {children}
+            </div>
           </div>
         </main>
       </div>
