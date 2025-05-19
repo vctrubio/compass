@@ -254,7 +254,7 @@ export function DbProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  window.io = tablesObj; // For debugging purposes
+  window.tt = tablesObj; // For debugging purposes
   return (
     <DbContext.Provider value={{ tables: tablesObj }}>
       {children}
