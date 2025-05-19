@@ -44,6 +44,8 @@ export default function StudentsPage() {
     },
   };
 
+  window.students = tableData;
+
   return (
     <ControllerContent
       title="Students"

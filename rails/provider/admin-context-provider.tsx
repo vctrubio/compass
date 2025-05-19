@@ -11,7 +11,7 @@ interface AdminContextType extends RailsContextType {
 
 // Define the AdminProvider component that wraps RailsProvider
 const AdminProvider = ({ children }: { children: React.ReactNode }) => {
-  // We'll use the RailsProvider's context as a base
+  console.log('👑 AdminProvider: Initializing');
   return (
     <RailsProvider>
       <AdminProviderInner>
@@ -36,17 +36,24 @@ const AdminProviderInner = ({ children }: { children: React.ReactNode }) => {
   
   // Fetch admin-specific tables data only once
   useEffect(() => {
+    console.log('👑 AdminProvider: Checking conditions for table fetch:', {
+      hasUser: !!user,
+      isLoading,
+      isAdmin,
+      tablesLoaded: tablesLoadedRef.current
+    });
+
     if (user && !isLoading && isAdmin && !tablesLoadedRef.current) {
-      console.log('Admin user detected. Fetching admin-specific tables...');
+      console.log('👑 AdminProvider: Starting admin table fetch');
       
       const fetchAdminTables = async () => {
         try {
-          console.log(`Admin context will fetch data for: ${tablesToFetch.join(', ')}`);
+          console.log('👑 AdminProvider: Fetching admin tables:', tablesToFetch);
           await fetchTables(tablesToFetch);
           tablesLoadedRef.current = true;
-          console.log('Admin tables fetch complete');
+          console.log('✅ AdminProvider: Admin tables fetch complete');
         } catch (error) {
-          console.error("Error fetching admin tables:", error);
+          console.error("❌ AdminProvider: Error fetching admin tables:", error);
         }
       };
       

@@ -19,8 +19,7 @@ const fetchTableDataRaw = async (
       throw new Error(`Table "${tableName}" is not in the allowed tables list`);
     }
 
-    console.log(`Fetching raw data from table: ${tableName}`);
-
+    console.log(`📥 DB_FETCH: Fetching raw data from table: ${tableName}`);
     // Fetch actual data from the table
     const { data, error } = await client.from(tableName).select("*");
 
@@ -28,9 +27,10 @@ const fetchTableDataRaw = async (
       throw error;
     }
 
+    console.log(`✅ DB_FETCH: Successfully fetched ${data?.length || 0} rows from ${tableName}`);
     return data || [];
   } catch (error) {
-    console.error(`Unexpected error fetching data from ${tableName}:`, error);
+    console.error(`❌ DB_FETCH: Error fetching data from ${tableName}:`, error);
     return null;
   }
 };
@@ -45,7 +45,7 @@ export const fetchTablesDataFromDb = async (
   client: SupabaseClient,
   tableNames: string[]
 ): Promise<Record<string, TableEntity>> => {
-  console.log(`Fetching and initializing tables: ${tableNames.join(", ")}`);
+  console.log(`🔄 DB_FETCH: Starting fetch for tables: ${tableNames.join(", ")}`);
   return await initializeTables(client, tableNames);
 };
 
@@ -59,6 +59,7 @@ export const initializeTables = async (
   client: SupabaseClient,
   tablesToFetch: string[]
 ): Promise<Record<string, TableEntity>> => {
+  console.log(`📚 DB_FETCH: Initializing ${tablesToFetch.length} tables`);
   const tables: Record<string, TableEntity> = {};
 
   // Default empty API implementation
@@ -72,8 +73,7 @@ export const initializeTables = async (
 
   // Process each table
   for (const tableName of tablesToFetch) {
-    console.log(`Initializing table entity for: ${tableName}`);
-
+    console.log(`🔄 DB_FETCH: Processing table: ${tableName}`);
     try {
       // Fetch data for this table
       const tableData = await fetchTableDataRaw(client, tableName);
@@ -106,8 +106,9 @@ export const initializeTables = async (
         relationship: tableDictInfo?.relationship || [],
         desc: tableDictInfo?.desc || `Table for ${tableName}`,
       };
+      console.log(`✅ DB_FETCH: Successfully initialized table: ${tableName}`);
     } catch (error) {
-      console.error(`Error initializing table ${tableName}:`, error);
+      console.error(`❌ DB_FETCH: Error initializing table ${tableName}:`, error);
 
       // Add a placeholder entry even if there was an error
       // Use dictionary information if available
@@ -124,5 +125,6 @@ export const initializeTables = async (
     }
   }
 
+  console.log(`✅ DB_FETCH: Completed initialization of ${Object.keys(tables).length} tables`);
   return tables;
 };

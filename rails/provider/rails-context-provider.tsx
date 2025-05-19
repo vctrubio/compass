@@ -27,11 +27,14 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
     // Create a memoized fetchTables function to pass down to children
     const fetchTables = useCallback(async (tableNames: string[]): Promise<Record<string, TableEntity>> => {
         try {
+            console.log('🔍 RailsProvider: fetchTables called with tables:', tableNames);
+            console.log('📊 RailsProvider: Currently loaded tables:', Array.from(loadedTables));
+            
             // Filter out tables that have already been loaded to prevent duplicates
             const tablesToLoad = tableNames.filter(name => !loadedTables.has(name));
             
             if (tablesToLoad.length === 0) {
-                console.log('All requested tables are already loaded');
+                console.log('✅ RailsProvider: All requested tables already loaded');
                 // Return the subset of tables that were requested
                 const requestedTables: Record<string, TableEntity> = {};
                 tableNames.forEach(name => {
@@ -42,41 +45,47 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
                 return requestedTables;
             }
             
-            console.log(`Parent context fetching tables: ${tablesToLoad.join(', ')}`);
+            console.log('🔄 RailsProvider: Fetching new tables:', tablesToLoad);
             const fetchedTables = await fetchTablesDataFromDb(supabase, tablesToLoad);
             
             // Update our state with the new tables
-            setTables(prevTables => ({
-                ...prevTables,
-                ...fetchedTables
-            }));
+            setTables(prevTables => {
+                console.log('📝 RailsProvider: Updating tables state with:', Object.keys(fetchedTables));
+                return {
+                    ...prevTables,
+                    ...fetchedTables
+                };
+            });
             
             // Mark these tables as loaded
             setLoadedTables(prev => {
                 const newSet = new Set(prev);
                 tablesToLoad.forEach(name => newSet.add(name));
+                console.log('📚 RailsProvider: Updated loaded tables:', Array.from(newSet));
                 return newSet;
             });
             
             return fetchedTables;
         } catch (error) {
-            console.error("Error fetching tables:", error);
+            console.error("❌ RailsProvider: Error fetching tables:", error);
             return {};
         }
     }, [supabase, tables, loadedTables]);
 
     useEffect(() => {
+        console.log('👤 RailsProvider: Initializing user state');
         (async () => {
             try {
                 const { data, error } = await supabase.auth.getUser();
                 if (error) {
-                    console.error('Error fetching user:', error);
+                    console.error('❌ RailsProvider: Error fetching user:', error);
                     setUser(null);
                 } else {
+                    console.log('✅ RailsProvider: User loaded:', data.user?.email);
                     setUser(data.user);
                 }
             } catch (error) {
-                console.error('Unexpected error:', error);
+                console.error('❌ RailsProvider: Unexpected error:', error);
                 setUser(null);
             } finally {
                 setIsLoading(false);
@@ -86,6 +95,7 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
         // Set up auth state change listener
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (event, session) => {
+                console.log('🔄 RailsProvider: Auth state changed:', event);
                 setUser(session?.user ?? null);
             }
         );
@@ -99,28 +109,17 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
     // Fetch core tables only once when app loads
     useEffect(() => {
         if (!isLoading && user) {
+            console.log('📚 RailsProvider: Loading core tables for user:', user.email);
             // Fetch only the core tables needed for all users
             const coreTables = ['students', 'teachers']; // Define your core tables here
-            
-            fetchTables(coreTables).then(() => {
-                console.log('Initial core tables loaded');
-            });
+            fetchTables(coreTables);
         }
     }, [isLoading, user, fetchTables]);
 
     const signOut = async () => {
-        console.log("Signing out from Rails context...");
+        console.log('👋 RailsProvider: Signing out user');
         await signOutAction();
     };
-
-    // Only access window in client components and when it's available
-    if (typeof window !== 'undefined') {
-        window.test1 = 'test1';
-        window.user = user;
-        window.isLoading = isLoading;
-        window.tss = tablesToFetch;
-        window.tables = tables;
-    }
 
     const contextValue = {
         user,

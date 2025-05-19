@@ -242,40 +242,6 @@ export function ControllerContent({
     data: filteredData
   };
 
-  // Handle form submission
-  const handleFormSubmit = (data: any) => {
-    console.log('Form submitted:', data);
-    // Here you would typically add the new record to your data
-    if (tableData?.api.put) {
-      tableData.api.put(data)
-        .then((result) => {
-          console.log('Record added:', result);
-          
-          // For demo purposes, let's add the item to the local data
-          // In a real application, you'd wait for the API call to complete
-          const newItem = { ...data, id: Date.now() }; // Generate temp ID
-          setAllData(prev => [newItem, ...prev]);
-          
-          // Only close the form if keep open is not checked
-          if (!keepFormOpen) {
-            setShowAddForm(false);
-          }
-        })
-        .catch(error => {
-          console.error('Error adding record:', error);
-        });
-    } else {
-      // Fallback if no API is provided
-      const newItem = { ...data, id: Date.now() }; // Generate temp ID
-      setAllData(prev => [newItem, ...prev]);
-      
-      // Only close the form if keep open is not checked
-      if (!keepFormOpen) {
-        setShowAddForm(false);
-      }
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Controller UI with search, filter, sort */}
@@ -301,10 +267,12 @@ export function ControllerContent({
       {/* Add Form when showing */}
       {addForm && showAddForm && (
         <div className="mb-4">
-          
-          {/* Render the form with props */}
           {React.createElement(addForm, {
-            onSubmit: handleFormSubmit,
+            onSubmit: (data: any) => {
+              // The actual onSubmit handler is provided by the page component
+              // through the addForm prop
+              return Promise.resolve(true);
+            },
             isOpen: true,
             onClose: () => setShowAddForm(false)
           })}
