@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +8,7 @@ import { availableLanguages } from '@/rails/model/languages';
 import { FormStructure, FormProps } from './FormStructure';
 
 // Form Sections
-function PersonalInfoSection({ register, errors, nameInputRef }: { register: any; errors: any; nameInputRef: React.RefObject<HTMLInputElement | null> }) {
+function PersonalInfoSection({ register, errors }: { register: any; errors: any }) {
   return (
     <div className="lg:w-1/3 py-6 lg:px-6">
       <FormStructure.Section title="Personal Information">
@@ -16,7 +16,6 @@ function PersonalInfoSection({ register, errors, nameInputRef }: { register: any
           <FormStructure.Field label="Name *" id="name" error={errors.name?.message}>
             <Input
               id="name"
-              ref={nameInputRef}
               autoFocus
               {...register('name', {
                 required: "Name is required",
@@ -27,7 +26,7 @@ function PersonalInfoSection({ register, errors, nameInputRef }: { register: any
             />
           </FormStructure.Field>
         </div>
-
+        
         <div className="flex-1">
           <FormStructure.Field label="Age *" id="age" error={errors.age?.message}>
             <Input
@@ -123,18 +122,15 @@ function LanguagesSection({ control, errors }: { control: any; errors: any }) {
 
 // Main Form Component
 export function Student4AdminForm(props: FormProps<Student>) {
-  const nameInputRef = useRef<HTMLInputElement>(null);
-
   return (
     <FormStructure.Form
       {...props}
       defaultValues={defaultStudent}
       resolver={zodResolver(studentSchema)}
-      initialFocusRef={nameInputRef as React.RefObject<HTMLInputElement>}
     >
       {({ register, control, errors }) => (
         <>
-          <PersonalInfoSection register={register} errors={errors} nameInputRef={nameInputRef} />
+          <PersonalInfoSection register={register} errors={errors} />
           <ContactInfoSection register={register} errors={errors} />
           <LanguagesSection control={control} errors={errors} />
         </>

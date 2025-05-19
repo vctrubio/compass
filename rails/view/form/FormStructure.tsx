@@ -20,7 +20,6 @@ export interface FormProps<T extends FieldValues> {
   defaultValues: T;
   resolver: UseFormProps<T>['resolver'];
   mode?: UseFormProps<T>['mode'];
-  initialFocusRef?: RefObject<HTMLInputElement>;
 }
 
 export const FormStructure = {
@@ -63,7 +62,6 @@ export const FormStructure = {
     defaultValues, 
     resolver, 
     mode = "onChange",
-    initialFocusRef,
     children 
   }: FormProps<T> & { children: (props: { register: any; control: any; errors: any; }) => React.ReactNode }) => {
     const [keepFormOpen, setKeepFormOpen] = React.useState(false);
@@ -74,14 +72,6 @@ export const FormStructure = {
       resolver,
       mode
     });
-
-    useEffect(() => {
-      if (isOpen && initialFocusRef?.current) {
-        setTimeout(() => {
-          initialFocusRef.current?.focus();
-        }, 100);
-      }
-    }, [isOpen, initialFocusRef]);
 
     const onFormSubmit: SubmitHandler<T> = async (data) => {
       setSubmitError(null);
