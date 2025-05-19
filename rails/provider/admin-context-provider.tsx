@@ -1,14 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import RailsProvider, { RailsContext, useRailsContext, RailsContextType } from './rails-context-provider';
 import { ADMIN_TABLE_NAMES } from '@/rails/routes';
-import { fetchTableDataFromDb } from "@/rails/src/db_fetch";
-import { createClient } from "@/utils/supabase/client";
 
 // Extend the RailsContextType with admin-specific properties
 interface AdminContextType extends RailsContextType {
-  isAdmin: boolean; // Add admin-specific property
+  isAdmin: boolean;
 }
 
 // Define the AdminProvider component that wraps RailsProvider
@@ -30,29 +28,22 @@ const AdminProviderInner = ({ children }: { children: React.ReactNode }) => {
   const tablesToFetch = [...ADMIN_TABLE_NAMES];
   
   // Add admin-specific state
-  const [isAdmin] = useState<boolean>(true); // Default to true as requested
-  const { user, isLoading } = railsContext;
-  const supabase = createClient();
+  const [isAdmin] = useState<boolean>(true);
+  const { user, isLoading, fetchTables } = railsContext;
   
-  // Fetch admin-specific tables data - with batch processing to prevent re-renders
+  // Use ref to track if tables have been fetched
+  const tablesLoadedRef = useRef(false);
+  
+  // Fetch admin-specific tables data only once
   useEffect(() => {
-    if (user && !isLoading && isAdmin) {
+    if (user && !isLoading && isAdmin && !tablesLoadedRef.current) {
       console.log('Admin user detected. Fetching admin-specific tables...');
       
-      // Define an async function to fetch all tables in batch
       const fetchAdminTables = async () => {
         try {
           console.log(`Admin context will fetch data for: ${tablesToFetch.join(', ')}`);
-          
-          // Create an array of promises for all table fetches
-          const fetchPromises = tablesToFetch.map(async (tableName) => {
-            console.log(`Admin context requesting data for table: ${tableName}`);
-            return await fetchTableDataFromDb(supabase, tableName);
-          });
-          
-          // Wait for all promises to resolve, but don't do anything with results
-          // as the RailsContext will handle state updates
-          await Promise.all(fetchPromises);
+          await fetchTables(tablesToFetch);
+          tablesLoadedRef.current = true;
           console.log('Admin tables fetch complete');
         } catch (error) {
           console.error("Error fetching admin tables:", error);
@@ -62,17 +53,16 @@ const AdminProviderInner = ({ children }: { children: React.ReactNode }) => {
       // Execute the fetch function
       fetchAdminTables();
     }
-  }, [user, isLoading, isAdmin, supabase]);
+  }, [user, isLoading, isAdmin, fetchTables, tablesToFetch]);
   
   // Only access window in client components and when it's available
   if (typeof window !== 'undefined') {
-    window.isadmin = isAdmin; // Expose isAdmin to the window object for debugging
-    window.atables = tablesToFetch; // Expose tablesToFetch to the window object for debugging
+    window.isadmin = isAdmin;
   }
   
   return (
     <AdminContext.Provider value={{ 
-      ...railsContext, // Spread all properties from railsContext
+      ...railsContext,
       listTables: tablesToFetch,
       isAdmin,
     }}>

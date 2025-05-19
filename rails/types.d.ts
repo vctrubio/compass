@@ -11,6 +11,7 @@ export interface TableField {
 export interface TableEntity {
   name: string;
   fields: TableField[];
+  data: any[];
   api: {
     get: () => Promise<any>;
     getId: (id: string | number) => Promise<any>;

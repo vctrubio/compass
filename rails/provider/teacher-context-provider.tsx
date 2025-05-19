@@ -1,15 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
 import RailsProvider, { RailsContext, useRailsContext, RailsContextType } from './rails-context-provider';
 import { TEACHERS_TABLE_NAMES } from '@/rails/routes';
-import { fetchTableDataFromDb } from "@/rails/src/db_fetch";
-import { createClient } from "@/utils/supabase/client";
 
-interface TeacherContextType extends RailsContextType {
-  teacherData: any | null;
-  isFetchingTeacher: boolean;
-}
+// Teacher context just extends Rails context without additional properties
+interface TeacherContextType extends RailsContextType {}
 
 const TeacherProvider = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -23,55 +19,23 @@ const TeacherProvider = ({ children }: { children: React.ReactNode }) => {
 
 const TeacherProviderInner = ({ children }: { children: React.ReactNode }) => {
   const railsContext = useRailsContext();
-  const { user, isLoading } = railsContext;
+  const { user, isLoading, fetchTables } = railsContext;
   
-  const [teacherData, setTeacherData] = useState<any | null>(null);
-  const [isFetchingTeacher, setIsFetchingTeacher] = useState<boolean>(false);
-  const supabase = createClient();
+  // Use ref to track if tables have been fetched
+  const tablesLoadedRef = useRef(false);
   
+  // Only fetch teacher-specific tables once
   useEffect(() => {
-    if (user && user.id) {
-      const fetchTeacherData = async () => {
-        try {
-          setIsFetchingTeacher(true);
-          console.log(`User detected inside teacher context. Fetching teacher data for user ID: ${user.id}`);
-          
-          await new Promise(resolve => setTimeout(resolve, 500));
-          setTeacherData({
-            id: `teacher-${user.id}`,
-            name: user.email?.split('@')[0] || 'Unknown Teacher',
-            specialization: 'Math',
-            yearsExperience: 5,
-          });
-          
-        } catch (error) {
-          console.error('Error fetching teacher data:', error);
-          setTeacherData(null);
-        } finally {
-          setIsFetchingTeacher(false);
-        }
-      };
-      
-      fetchTeacherData();
-    }
-  }, [user]);
-  
-  useEffect(() => {
-    if (user && !isLoading) {
+    if (user && !isLoading && !tablesLoadedRef.current) {
       console.log('Teacher user detected. Fetching teacher-specific tables...');
       
       const tablesToFetch = [...TEACHERS_TABLE_NAMES];
       
       const fetchTeacherTables = async () => {
         try {
-          console.log(`Teacher context will fetch data for: ${tablesToFetch.join(', ')}`);
-          
-          const fetchPromises = tablesToFetch.map(async (tableName) => {
-            console.log(`Teacher context requesting data for table: ${tableName}`);
-            return await fetchTableDataFromDb(supabase, tableName);
-          });
-          
-          await Promise.all(fetchPromises);
+          console.log(`Teacher context requesting tables: ${tablesToFetch.join(', ')}`);
+          await fetchTables(tablesToFetch);
+          tablesLoadedRef.current = true;
           console.log('Teacher tables fetch complete');
         } catch (error) {
           console.error("Error fetching teacher tables:", error);
@@ -80,13 +44,11 @@ const TeacherProviderInner = ({ children }: { children: React.ReactNode }) => {
       
       fetchTeacherTables();
     }
-  }, [user, isLoading, supabase]);
+  }, [user, isLoading, fetchTables]);
   
   return (
     <TeacherContext.Provider value={{ 
       ...railsContext,
-      teacherData,
-      isFetchingTeacher,
       listTables: [...TEACHERS_TABLE_NAMES]
     }}>
       {children}
