@@ -15,7 +15,6 @@ export const metadata = {
   description: "The fastest way to build apps",
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{

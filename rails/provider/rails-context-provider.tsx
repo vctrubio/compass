@@ -1,9 +1,8 @@
-
 import { createContext, useContext, useState } from "react";
+import { signOutAction } from "@/app/actions";
+// Global types are now imported from rails/types.d.ts
 
-
-
-interface RailsContextType {
+export interface RailsContextType {
     // Define the properties and methods you want to expose
     currentUser: any; // Replace 'any' with the actual type of your user object
     signOut: () => Promise<void>;
@@ -14,14 +13,27 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<any>('fernando');
 
     const signOut = async () => {
-        console.log("Signing out...");
+        console.log("Signing out from Rails context...");
+        // Set local state to null
         setCurrentUser(null);
+        // Call the server action to sign out
+        await signOutAction();
     };
 
-    window.test1 = 'test1';
+    // Only access window in client components and when it's available
+    if (typeof window !== 'undefined') {
+        window.test1 = 'test1';
+    }
+
+    // Create a value object with all the context data
+    const contextValue = {
+        currentUser,
+        signOut,
+        // Add any other shared functionality here
+    };
 
     return (
-        <RailsContext.Provider value={{ currentUser, signOut }}>
+        <RailsContext.Provider value={contextValue}>
             {children}
         </RailsContext.Provider>
     );

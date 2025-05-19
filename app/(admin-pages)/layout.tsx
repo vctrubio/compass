@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel
 } from "@/components/ui/dropdown-menu";
 import { Search, Filter, SortDesc, Plus, ChevronDown } from "lucide-react";
-import { DbProvider } from "@/utils/context/db-context";
+import AdminProvider, { useAdminContext } from "@/rails/provider/admin-context-provider";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -74,6 +74,7 @@ const FilterDropdown = ({ struct, icon }: { struct: FilterStruct, icon: React.Re
 // Enhanced AdminHeader component with a double-line approach
 const AdminHeader = () => {
   const totalGetNumber = 42;
+  const { isAdmin, currentUser, signOut } = useAdminContext();
 
   return (
     <div className="max-w-5xl mx-auto pt-6">
@@ -89,8 +90,20 @@ const AdminHeader = () => {
               />
             </div>
           </div>
-          <div className="border border-muted/30 bg-secondary/10 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center whitespace-nowrap shadow-sm">
-            {totalGetNumber} items
+          <div className="flex gap-3">
+            <div className="border border-muted/30 bg-secondary/10 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center whitespace-nowrap shadow-sm">
+              {totalGetNumber} items
+            </div>
+            <div className="border border-green-200 bg-green-50 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center whitespace-nowrap shadow-sm text-green-700">
+              Admin: {isAdmin ? "Yes" : "No"} | User: {currentUser}
+            </div>
+            <Button 
+              variant="outline" 
+              className="border-red-200 hover:bg-red-50 text-red-700"
+              onClick={signOut}
+            >
+              Sign Out
+            </Button>
           </div>
         </div>
         
@@ -120,15 +133,15 @@ const AdminHeader = () => {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <DbProvider>
+    <AdminProvider>
       <div className="flex h-screen w-full">
         <main className="w-full p-4">
-          {/* <AdminHeader /> */}
+          <AdminHeader />
           <div className="mt-8">
             {children}
           </div>
         </main>
       </div>
-    </DbProvider>
+    </AdminProvider>
   );
 }
