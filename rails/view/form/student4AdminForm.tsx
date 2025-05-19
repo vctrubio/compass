@@ -121,10 +121,13 @@ function LanguagesSection({ control, errors }: { control: any; errors: any }) {
 }
 
 // Main Form Component
-export function Student4AdminForm(props: FormProps<Student>) {
+export function Student4AdminForm({ onSubmit, isOpen, onClose }: { onSubmit: (data: Student) => Promise<boolean>; isOpen: boolean; onClose: () => void }) {
   return (
     <FormStructure.Form
-      {...props}
+      onSubmit={onSubmit}
+      onCancel={onClose}
+      title="Add New Student"
+      isOpen={isOpen}
       defaultValues={defaultStudent}
       resolver={zodResolver(studentSchema)}
     >
