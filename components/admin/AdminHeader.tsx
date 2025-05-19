@@ -1,43 +1,120 @@
 'use client'
-
 import React from 'react';
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Plus } from "lucide-react";
-import { DbTable } from '@/utils/context/db-context';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel
+} from "@/components/ui/dropdown-menu";
+import { Search, Filter, SortDesc, Plus, ChevronDown } from "lucide-react";
+import { useAdminContext } from "@/rails/provider/admin-context-provider";
 
-interface AdminHeaderProps {
-  title: string;
-  table?: DbTable;
-  onAddNew: () => void;
+// Generic filter and sort option interfaces
+interface FilterOption {
+  label: string;
+  action: () => void;
 }
 
-export function AdminHeader({ title, table, onAddNew }: AdminHeaderProps) {
+interface FilterStruct {
+  label: string;
+  options: FilterOption[];
+}
+
+// Sample filter and sort structures
+const filterOptions: FilterStruct = {
+  label: "Filter By",
+  options: [
+    { label: "Status", action: () => console.log("Filter by status") },
+    { label: "Category", action: () => console.log("Filter by category") },
+    { label: "Date", action: () => console.log("Filter by date") }
+  ]
+};
+
+const sortOptions: FilterStruct = {
+  label: "Sort By",
+  options: [
+    { label: "Newest", action: () => console.log("Sort by newest") },
+    { label: "Oldest", action: () => console.log("Sort by oldest") },
+    { label: "Name (A-Z)", action: () => console.log("Sort by name") }
+  ]
+};
+
+// Generic dropdown component for filters and sorting
+const FilterDropdown = ({ struct, icon }: { struct: FilterStruct, icon: React.ReactNode }) => {
   return (
-    <div className="flex justify-between items-center mb-4">
-      <h1 className="text-2xl font-bold">{title}</h1>
-      <div className="flex gap-2">
-        {table && (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => table.refresh()}
-            disabled={table?.loading}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${table?.loading ? 'animate-spin' : ''}`} />
-            Refresh Data
-          </Button>
-        )}
-        <Button 
-          variant="default" 
-          size="sm" 
-          onClick={onAddNew}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add New Item
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="h-10 border-muted/30 px-4 gap-2">
+          {icon}
+          <span>{struct.label.split(" ")[0]}</span>
+          <ChevronDown className="h-3 w-3 opacity-50" />
         </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-56">
+        <DropdownMenuLabel>{struct.label}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {struct.options.map((option, index) => (
+          <DropdownMenuItem key={index} onClick={option.action}>
+            {option.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+// Enhanced AdminHeader component with a double-line approach
+const AdminHeader: React.FC = () => {
+  const adminContext = useAdminContext();
+  const totalItems = Object.keys(adminContext.tables).length;
+
+  return (
+    <div className="max-w-5xl mx-auto pt-6">
+      <div className="flex flex-col space-y-6">
+        {/* First row - Search and Status */}
+        <div className="flex items-center gap-4">
+          <div className="flex-grow">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input 
+                placeholder="Search admin dashboard..."
+                className="pl-12 py-6 text-base rounded-lg shadow-sm border-muted/30 focus-visible:ring-primary/20 focus-visible:ring-offset-0"
+              />
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="border border-muted/30 bg-secondary/10 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center whitespace-nowrap shadow-sm">
+              {totalItems} items
+            </div>
+          </div>
+        </div>
+        
+        {/* Second row - Filters, Sort, Add */}
+        <div className="flex flex-wrap gap-3">
+          <FilterDropdown 
+            struct={filterOptions} 
+            icon={<Filter className="h-4 w-4" />} 
+          />
+          
+          <FilterDropdown 
+            struct={sortOptions} 
+            icon={<SortDesc className="h-4 w-4" />} 
+          />
+          
+          <div className="ml-auto">
+            <Button className="h-10 px-4 gap-2">
+              <Plus className="h-4 w-4" />
+              <span>Add New</span>
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default AdminHeader;

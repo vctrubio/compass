@@ -15,11 +15,13 @@ export const ALL_TABLE_NAMES = [
 ] as const;
 
 export const ADMIN_TABLE_NAMES = [
-  'teachers',
-  'students',
+  'bookings',
+  'equipment',
   'lessons',
   'packages',
-  'bookings'
+  'sessions',
+  'students',
+  'teachers',
 ] as const;
 
 export const STUDENTS_TABLE_NAMES = [
