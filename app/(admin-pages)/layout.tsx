@@ -74,7 +74,7 @@ const FilterDropdown = ({ struct, icon }: { struct: FilterStruct, icon: React.Re
 // Enhanced AdminHeader component with a double-line approach
 const AdminHeader = () => {
   const totalGetNumber = 42;
-  const { isAdmin, currentUser, signOut } = useAdminContext();
+  const { isAdmin, user, signOut, isLoading, listTables } = useAdminContext();
 
   return (
     <div className="max-w-5xl mx-auto pt-6">
@@ -95,8 +95,27 @@ const AdminHeader = () => {
               {totalGetNumber} items
             </div>
             <div className="border border-green-200 bg-green-50 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center whitespace-nowrap shadow-sm text-green-700">
-              Admin: {isAdmin ? "Yes" : "No"} | User: {currentUser}
+              Admin: {isAdmin ? "Yes" : "No"} | User: {isLoading ? "Loading..." : user?.email || "Not logged in"}
             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="border-blue-200 hover:bg-blue-50 text-blue-700"
+                >
+                  Available Tables ({listTables.length})
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Tables</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {listTables.map((table, index) => (
+                  <DropdownMenuItem key={index}>
+                    {table}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button 
               variant="outline" 
               className="border-red-200 hover:bg-red-50 text-red-700"

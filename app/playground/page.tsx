@@ -5,7 +5,7 @@ import { useRailsContext } from '@/rails/provider/rails-context-provider';
 
 export default function PlaygroundPage() {
   const [currentText, setCurrentText] = useState<string>('');
-  const { currentUser } = useRailsContext();
+  const { user, isLoading } = useRailsContext();
   
   useEffect(() => {
     // Function to handle keydown events
@@ -36,9 +36,13 @@ export default function PlaygroundPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-8">
       <div className="mb-8 bg-slate-100 dark:bg-slate-800 p-4 rounded-lg shadow-md">
         <h2 className="text-xl font-bold mb-2">Current User:</h2>
-        <pre className="bg-white dark:bg-slate-700 p-3 rounded overflow-auto max-w-xl">
-          {JSON.stringify(currentUser, null, 2)}
-        </pre>
+        {isLoading ? (
+          <div className="bg-white dark:bg-slate-700 p-3 rounded text-center">Loading user data...</div>
+        ) : (
+          <pre className="bg-white dark:bg-slate-700 p-3 rounded overflow-auto max-w-xl">
+            {JSON.stringify(user, null, 2)}
+          </pre>
+        )}
       </div>
       
       <div className="w-full max-w-3xl flex items-center justify-center h-80">
