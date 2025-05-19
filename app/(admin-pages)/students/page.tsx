@@ -9,7 +9,8 @@ import { dbTableDictionary } from "@/rails/typesDictionary";
 
 interface FilterValue {
   field: string;
-  value: string | number;
+  value: string | number | Array<string | number>;
+  isMultiSelect?: boolean;
 }
 
 export default function StudentsPage() {
@@ -53,20 +54,51 @@ export default function StudentsPage() {
       activeFilters.forEach(filter => {
         if (filter.field === 'age') {
           // Special handling for age groups
-          const [min, max] = String(filter.value).split('-');
-          if (max) {
-            result = result.filter(item => item.age >= Number(min) && item.age <= Number(max));
+          if (Array.isArray(filter.value)) {
+            // Handle multiple age groups
+            result = result.filter(item => {
+              return (filter.value as Array<string | number>).some((rangeValue: string | number) => {
+                const [min, max] = String(rangeValue).split('-');
+                if (max) {
+                  return item.age >= Number(min) && item.age <= Number(max);
+                } else {
+                  return item.age >= Number(String(rangeValue).replace('+', ''));
+                }
+              });
+            });
           } else {
-            result = result.filter(item => item.age >= Number(min.replace('+', '')));
+            // Handle single age group
+            const [min, max] = String(filter.value).split('-');
+            if (max) {
+              result = result.filter(item => item.age >= Number(min) && item.age <= Number(max));
+            } else {
+              result = result.filter(item => item.age >= Number(String(filter.value).replace('+', '')));
+            }
           }
         } else if (filter.field === 'languages') {
-          // Handle array fields
-          result = result.filter(item => 
-            Array.isArray(item.languages) && item.languages.includes(filter.value)
-          );
+          if (Array.isArray(filter.value)) {
+            // Multiple language selection (OR logic - student has any of selected languages)
+            result = result.filter(item => 
+              Array.isArray(item.languages) && 
+              (filter.value as Array<string | number>).some((lang: string | number) => 
+                item.languages.includes(lang)
+              )
+            );
+          } else {
+            // Single language selection
+            result = result.filter(item => 
+              Array.isArray(item.languages) && item.languages.includes(filter.value)
+            );
+          }
         } else {
-          // Default filter
-          result = result.filter(item => item[filter.field] === filter.value);
+          // Default filter - handle both array and single value
+          if (Array.isArray(filter.value)) {
+            result = result.filter(item => 
+              (filter.value as Array<string | number>).includes(item[filter.field])
+            );
+          } else {
+            result = result.filter(item => item[filter.field] === filter.value);
+          }
         }
       });
     }
@@ -117,9 +149,21 @@ export default function StudentsPage() {
     });
   };
 
+  // Handle filter removal
+  const handleFilterRemove = (field: string) => {
+    setActiveFilters(prev => prev.filter(f => f.field !== field));
+  };
+
   // Handle sort changes
   const handleSortChange = (sort: SortOption) => {
     setActiveSort(sort);
+  };
+
+  // Reset all filters and sort
+  const handleResetFilters = () => {
+    setActiveFilters([]);
+    setActiveSort(undefined);
+    setSearchTerm("");
   };
 
   // Handle adding a new student
@@ -143,7 +187,9 @@ export default function StudentsPage() {
         filterOptions={filterOptions}
         sortOptions={sortOptions}
         onFilterChange={handleFilterChange}
+        onFilterRemove={handleFilterRemove}
         onSortChange={handleSortChange}
+        onResetFilters={handleResetFilters}
         activeFilters={activeFilters}
         activeSort={activeSort}
         totalItems={filteredData.length}

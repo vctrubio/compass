@@ -11,6 +11,7 @@ export interface TableField {
 export interface FilterOption {
   field: string;
   label: string;
+  multiSelect?: boolean;
   options?: Array<{value: string | number, label: string}>;
 }
 

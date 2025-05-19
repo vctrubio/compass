@@ -15,7 +15,7 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     relationship: ["bookings", "studentAvailabilityWindows"],
     desc: "Students table - contains student profiles and their information",
     filterBy: [
-      { field: 'languages', label: 'Language', options: [
+      { field: 'languages', label: 'Language', multiSelect: true, options: [
         { value: 'english', label: 'English' },
         { value: 'spanish', label: 'Spanish' },
         { value: 'french', label: 'French' }
