@@ -81,6 +81,10 @@ export function Student4AdminForm({ onSubmit, isOpen, onClose }: StudentFormProp
     onSubmit(data);
   };
 
+  const onError = (errors: any) => {
+    console.log('Validation failed:', errors);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -88,13 +92,7 @@ export function Student4AdminForm({ onSubmit, isOpen, onClose }: StudentFormProp
       <div className="bg-background rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <FormHeader onClose={onClose} />
         
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit(onFormSubmit)(e);
-          }} 
-          className="p-6 space-y-6"
-        >
+        <form onSubmit={handleSubmit(onFormSubmit, onError)} className="p-6 space-y-6">
           <div className="flex flex-col space-y-6">
             <FormSection title="Personal Information">
               <div className="flex-1">
@@ -197,10 +195,6 @@ export function Student4AdminForm({ onSubmit, isOpen, onClose }: StudentFormProp
             <Button
               type="submit"
               className="px-8"
-              onClick={() => {
-                console.log('Submit button clicked');
-                handleSubmit(onFormSubmit)();
-              }}
             >
               Add Student
             </Button>
