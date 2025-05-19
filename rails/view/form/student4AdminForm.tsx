@@ -62,27 +62,6 @@ function FormHeader({ onClose }: { onClose: () => void }) {
   );
 }
 
-function FormActions({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="flex justify-end space-x-8 pt-4 border-t">
-      <Button
-        type="button"
-        variant="outline"
-        onClick={onClose}
-        className="px-8"
-      >
-        Cancel
-      </Button>
-      <Button
-        type="submit"
-        className="px-8"
-      >
-        Add Student
-      </Button>
-    </div>
-  );
-}
-
 export function Student4AdminForm({ onSubmit, isOpen, onClose }: StudentFormProps) {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const { register, handleSubmit, control, formState: { errors } } = useForm<Student>({
@@ -109,7 +88,13 @@ export function Student4AdminForm({ onSubmit, isOpen, onClose }: StudentFormProp
       <div className="bg-background rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <FormHeader onClose={onClose} />
         
-        <form onSubmit={handleSubmit(onFormSubmit)} className="p-6 space-y-6">
+        <form 
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit(onFormSubmit)(e);
+          }} 
+          className="p-6 space-y-6"
+        >
           <div className="flex flex-col space-y-6">
             <FormSection title="Personal Information">
               <div className="flex-1">

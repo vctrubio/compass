@@ -3,10 +3,15 @@ import { useAdminContext } from "@/rails/provider/admin-context-provider";
 import { ControllerContent } from "@/rails/controller/ControllerContent";
 import { dbTableDictionary } from "@/rails/typesDictionary";
 import { Student4AdminForm } from "@/rails/view/form/student4AdminForm";
+import { Student } from "@/rails/model/student";
 
 export default function StudentsPage() {
   const { tables } = useAdminContext();
   const studentsTable = tables.students;
+
+  const handleStudentSubmit = (data: Student) => {
+    console.log("Hello world, this is a submit button test with form data:", data);
+  };
 
   if (!studentsTable) {
     return <div>No table found</div>;
@@ -39,7 +44,7 @@ export default function StudentsPage() {
       tableName="students"
       tableData={tableData}
       searchFields={["name", "email", "first_name", "last_name"]}
-      addForm={Student4AdminForm}
+      addForm={(props) => <Student4AdminForm {...props} onSubmit={handleStudentSubmit} />}
     />
   );
 }
