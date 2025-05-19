@@ -13,14 +13,14 @@ const fetchTableDataRaw = async (
   client: SupabaseClient,
   tableName: string
 ): Promise<any> => {
+
   try {
-    // Check if the table exists in the allowed tables list
     if (!ALL_TABLE_NAMES.includes(tableName as any)) {
       throw new Error(`Table "${tableName}" is not in the allowed tables list`);
     }
 
     console.log(`📥 DB_FETCH: Fetching raw data from table: ${tableName}`);
-    // Fetch actual data from the table
+
     const { data, error } = await client.from(tableName).select("*");
 
     if (error) {
@@ -62,14 +62,48 @@ export const initializeTables = async (
   console.log(`📚 DB_FETCH: Initializing ${tablesToFetch.length} tables`);
   const tables: Record<string, TableEntity> = {};
 
-  // Default empty API implementation
-  const defaultApi = {
-    get: async () => Promise.resolve([]),
-    getId: async () => Promise.resolve(null),
-    put: async () => Promise.resolve(null),
-    updateId: async () => Promise.resolve(null),
-    deleteId: async () => Promise.resolve(null),
-  };
+  // Create table-specific API implementation
+  const createTableApi = (tableName: string) => ({
+    get: async () => {
+      const { data, error } = await client.from(tableName).select();
+      if (error) throw error;
+      return data;
+    },
+    getId: async (id: string | number) => {
+      const { data, error } = await client
+        .from(tableName)
+        .select()
+        .eq('id', id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    put: async (data: any) => {
+      const { data: result, error } = await client
+        .from(tableName)
+        .insert(data)
+        .select();
+      if (error) throw error;
+      return result;
+    },
+    updateId: async (id: string | number, data: any) => {
+      const { data: result, error } = await client
+        .from(tableName)
+        .update(data)
+        .eq('id', id)
+        .select();
+      if (error) throw error;
+      return result;
+    },
+    deleteId: async (id: string | number) => {
+      const { error } = await client
+        .from(tableName)
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      return true;
+    },
+  });
 
   // Process each table
   for (const tableName of tablesToFetch) {
@@ -86,17 +120,17 @@ export const initializeTables = async (
     // Create the table entity using available data
     tables[tableName] = {
       name: tableName,
-      fields: tableDictInfo?.fields ||
+      fields: tableDictInfo?.fields || 
         (tableData && tableData.length > 0
           ? Object.keys(tableData[0]).map((key) => ({
-            name: key,
-            type: typeof tableData[0][key],
-            required: false,
-            isPrimaryKey: false,
-          }))
+              name: key,
+              type: typeof tableData[0][key],
+              required: false,
+              isPrimaryKey: false,
+            }))
           : []),
       data: tableData || [],
-      api: defaultApi,
+      api: createTableApi(tableName),
       relationship: tableDictInfo?.relationship || [],
       desc: tableDictInfo?.desc || `Table for ${tableName}`,
     };

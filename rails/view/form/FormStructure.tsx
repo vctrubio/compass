@@ -12,7 +12,7 @@ interface FormFieldProps {
   children: React.ReactNode;
 }
 
-export interface FormProps<T extends FieldValues> {
+export interface FormProps<T extends FieldValues = FieldValues> {
   onSubmit: (data: T) => Promise<boolean>;
   onCancel: () => void;
   title: string;

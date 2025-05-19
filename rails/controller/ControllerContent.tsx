@@ -269,8 +269,6 @@ export function ControllerContent({
         <div className="mb-4">
           {React.createElement(addForm, {
             onSubmit: (data: any) => {
-              // The actual onSubmit handler is provided by the page component
-              // through the addForm prop
               return Promise.resolve(true);
             },
             isOpen: true,

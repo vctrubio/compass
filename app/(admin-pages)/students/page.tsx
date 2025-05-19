@@ -12,6 +12,8 @@ export default function StudentsPage() {
   const handleStudentSubmit = async (data: Student): Promise<boolean> => {
     try {
       console.log("Hello world, this is a submit button test with form data:", data);
+      const result = await studentsTable.api?.put(data);
+      console.log("Result of put:", result);
       return true;
     } catch (error) {
       console.error("Error submitting student:", error);
@@ -23,34 +25,13 @@ export default function StudentsPage() {
     return <div>No table found</div>;
   }
 
-  // Convert the studentsTable to the format expected by ControllerContent
-  const tableData = {
-    name: studentsTable.name,
-    fields: studentsTable.fields,
-    data: studentsTable.data,
-    filterBy: studentsTable.filterBy || dbTableDictionary.students?.filterBy || [],
-    sortBy: studentsTable.sortBy || dbTableDictionary.students?.sortBy || [],
-    relationship: studentsTable.relationship || dbTableDictionary.students?.relationship || [],
-    desc: studentsTable.desc || dbTableDictionary.students?.desc || "Students table",
-    api: {
-      get: async () => studentsTable.data || [],
-      getId: async (id: string | number) => {
-        const idStr = String(id);
-        return studentsTable.data?.find((item) => String(item.id) === idStr) || null;
-      },
-      put: async (data: any) => ({ data, error: null }),
-      updateId: async (id: string | number, data: any) => ({ success: true, error: null }),
-      deleteId: async (id: string | number) => ({ success: true, error: null }),
-    },
-  };
-
-  window.students = tableData;
+  window.students = studentsTable;
 
   return (
     <ControllerContent
       title="Students"
       tableName="students"
-      tableData={tableData}
+      tableData={studentsTable}
       searchFields={["name", "email", "first_name", "last_name"]}
       addForm={(props) => <Student4AdminForm {...props} onSubmit={handleStudentSubmit} />}
     />
