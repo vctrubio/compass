@@ -1,6 +1,6 @@
 import { TableField, TableEntity } from "@/rails/types";
 
-export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'fields' | 'relationship' | 'desc'>> = {
+export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'fields' | 'relationship' | 'desc' | 'filterBy' | 'sortBy'>> = {
   students: {
     name: "students",
     fields: [
@@ -13,7 +13,25 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'authId', type: 'string', required: false, isPrimaryKey: false }
     ],
     relationship: ["bookings", "studentAvailabilityWindows"],
-    desc: "Students table - contains student profiles and their information"
+    desc: "Students table - contains student profiles and their information",
+    filterBy: [
+      { field: 'languages', label: 'Language', options: [
+        { value: 'english', label: 'English' },
+        { value: 'spanish', label: 'Spanish' },
+        { value: 'french', label: 'French' }
+      ]},
+      { field: 'age', label: 'Age Group', options: [
+        { value: '18-25', label: '18-25' },
+        { value: '26-35', label: '26-35' },
+        { value: '36+', label: '36+' }
+      ]}
+    ],
+    sortBy: [
+      { field: 'name', label: 'Name (A-Z)', direction: 'asc' },
+      { field: 'name', label: 'Name (Z-A)', direction: 'desc' },
+      { field: 'age', label: 'Age (Low to High)', direction: 'asc' },
+      { field: 'age', label: 'Age (High to Low)', direction: 'desc' }
+    ]
   },
   
   teachers: {

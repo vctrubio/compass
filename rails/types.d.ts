@@ -8,6 +8,18 @@ export interface TableField {
   isPrimaryKey: boolean;
 }
 
+export interface FilterOption {
+  field: string;
+  label: string;
+  options?: Array<{value: string | number, label: string}>;
+}
+
+export interface SortOption {
+  field: string;
+  label: string;
+  direction?: 'asc' | 'desc';
+}
+
 export interface TableEntity {
   name: string;
   fields: TableField[];
@@ -21,6 +33,8 @@ export interface TableEntity {
   };
   relationship: string[];
   desc: string;
+  filterBy?: FilterOption[];
+  sortBy?: SortOption[];
 }
 
 declare global {
