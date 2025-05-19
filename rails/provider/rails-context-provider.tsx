@@ -4,26 +4,21 @@ import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { ALL_TABLE_NAMES } from "@/rails/routes";
 // Global types are now imported from rails/types.d.ts
-import { TableField, Table } from "@/rails/types";
+import { TableEntity } from "@/rails/types";
 
 export interface RailsContextType {
     user: User | null; // Properly typed Supabase user object
     signOut: () => Promise<void>;
     isLoading: boolean; // Flag to indicate if user data is still loading
     listTables: string[]; // List of available tables
-    tables: {
-        listTables: Record<string, Table>;
-    };
-    // fetchTableDataFromDb removed from here
+    tables: Record<string, TableEntity>; // Directly access tables by name
 }
 
 
 const RailsProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [tables, setTables] = useState<{ listTables: Record<string, Table> }>({ 
-        listTables: {} 
-    });
+    const [tables, setTables] = useState<Record<string, TableEntity>>({});
     const supabase = createClient();
     const tablesToFetch = [...ALL_TABLE_NAMES];
 
@@ -71,8 +66,8 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
     if (typeof window !== 'undefined') {
         window.test1 = 'test1';
         window.user = user;
-        window.isLoading = isLoading;
-        window.tss = tablesToFetch
+        window.list = tablesToFetch;
+        window.tables = tables;
     }
 
     // Create a value object with all the context data
@@ -81,8 +76,7 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
         signOut,
         isLoading,
         listTables: tablesToFetch, // Spread the array to create a copy
-        tables, // The structured table information
-        // fetchTableDataFromDb removed from here
+        tables, // The structured table information - now directly a Record
     };
 
     return (

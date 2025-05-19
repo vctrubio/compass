@@ -8,7 +8,8 @@ export interface TableField {
   isPrimaryKey: boolean;
 }
 
-export interface Table {
+export interface TableEntity {
+  name: string;
   fields: TableField[];
   api: {
     get: () => Promise<any>;
