@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { toast } from '@/components/ui/use-toast';
-
-// Import the student schema, types, and constants
-import { studentSchema, Student, defaultStudent, availableLanguages } from '@/rails/model/student';
+import { useForm, Controller } from 'react-hook-form';
+import { studentSchema, Student, defaultStudent } from '@/rails/model/student';
+import { availableLanguages } from '@/rails/model/languages';
 
 interface StudentFormProps {
   onSubmit: (student: Student) => void;
@@ -18,163 +16,172 @@ interface StudentFormProps {
 }
 
 export function Student4AdminForm({ onSubmit, isOpen, onClose }: StudentFormProps) {
-  const [student, setStudent] = useState<Student>({
-    name: '',
-    email: '',
-    phone: '',
-    languages: [],
-    age: 0
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const { register, handleSubmit, control, formState: { errors } } = useForm<Student>({
+    resolver: zodResolver(studentSchema),
+    defaultValues: defaultStudent
   });
 
-  const formRef = useRef<HTMLFormElement>(null);
-  const nameInputRef = useRef<HTMLInputElement>(null);
-
-  // Focus on name input when form opens
   useEffect(() => {
     if (isOpen && nameInputRef.current) {
       nameInputRef.current.focus();
     }
   }, [isOpen]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setStudent(prev => ({
-      ...prev,
-      [name]: name === 'age' ? parseInt(value) || 0 : value
-    }));
-  };
-
-  const handleLanguageToggle = (language: string) => {
-    setStudent(prev => {
-      const languages = prev.languages.includes(language)
-        ? prev.languages.filter(l => l !== language)
-        : [...prev.languages, language];
-      return { ...prev, languages };
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Validate languages - at least one language is required
-    if (student.languages.length === 0) {
-      alert("Please select at least one language");
-      return;
-    }
-    onSubmit(student);
-    
-    // Reset the form after submission
-    setStudent({
-      name: '',
-      email: '',
-      phone: '',
-      languages: [],
-      age: 0
-    });
-    
-    // Focus back on the name input for better UX
-    if (nameInputRef.current) {
-      nameInputRef.current.focus();
-    }
+  const onFormSubmit = (data: Student) => {
+    console.log('Form data:', data);
+    console.log('Trying to submit...');
+    onSubmit(data);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="p-4 border rounded-md bg-card shadow-sm my-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">Add New Student</h3>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 w-8 p-0" 
-          onClick={onClose}
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
-      
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
-            <Input
-              id="name"
-              name="name"
-              ref={nameInputRef}
-              value={student.name}
-              onChange={handleInputChange}
-              placeholder="Full name"
-              required
-            />
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-background rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-background border-b p-4 flex justify-between items-center">
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold">Add New Student</h2>
+            <p className="text-sm text-muted-foreground">Admin Panel</p>
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="age">Age *</Label>
-            <Input
-              id="age"
-              name="age"
-              type="number"
-              value={student.age || ''}
-              onChange={handleInputChange}
-              placeholder="Age"
-              required
-              min={1}
-            />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={student.email}
-              onChange={handleInputChange}
-              placeholder="Email address"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              name="phone"
-              value={student.phone}
-              onChange={handleInputChange}
-              placeholder="Phone number"
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Languages *</Label>
-          <div className="flex flex-wrap gap-4">
-            {availableLanguages.map((language) => (
-              <div key={language} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`lang-${language}`}
-                  checked={student.languages.includes(language)}
-                  onCheckedChange={() => handleLanguageToggle(language)}
-                />
-                <label
-                  htmlFor={`lang-${language}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize"
-                >
-                  {language}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        <div className="flex justify-end">
-          <Button type="submit" className="w-full sm:w-auto">
-            Add Student
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0 hover:bg-muted" 
+            onClick={onClose}
+          >
+            <X className="h-4 w-4" />
           </Button>
         </div>
-      </form>
+        
+        <form onSubmit={handleSubmit(onFormSubmit)} className="p-6 space-y-6">
+          <div className="space-y-6">
+            {/* Personal Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground/80">Personal Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">Full Name *</Label>
+                  <Input
+                    id="name"
+                    {...register('name')}
+                    ref={nameInputRef}
+                    placeholder="Enter full name"
+                    className="w-full"
+                  />
+                  {errors.name && (
+                    <p className="text-sm text-destructive">{errors.name.message}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="age" className="text-sm font-medium">Age *</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    {...register('age', { valueAsNumber: true })}
+                    placeholder="Enter age"
+                    className="w-full"
+                  />
+                  {errors.age && (
+                    <p className="text-sm text-destructive">{errors.age.message}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground/80">Contact Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    {...register('email')}
+                    placeholder="Enter email address"
+                    className="w-full"
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email.message}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    {...register('phone')}
+                    placeholder="Enter phone number"
+                    className="w-full"
+                  />
+                  {errors.phone && (
+                    <p className="text-sm text-destructive">{errors.phone.message}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Languages Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground/80">Languages *</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {Array.from(availableLanguages).map((language) => (
+                  <div key={language} className="flex items-center space-x-2">
+                    <Controller
+                      name="languages"
+                      control={control}
+                      render={({ field }) => (
+                        <Checkbox
+                          id={`lang-${language}`}
+                          checked={field.value?.includes(language)}
+                          onCheckedChange={(checked) => {
+                            const currentLanguages = field.value || [];
+                            if (checked) {
+                              field.onChange([...currentLanguages, language]);
+                            } else {
+                              field.onChange(currentLanguages.filter(l => l !== language));
+                            }
+                          }}
+                          className="border-2"
+                        />
+                      )}
+                    />
+                    <label
+                      htmlFor={`lang-${language}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize"
+                    >
+                      {language}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {errors.languages && (
+                <p className="text-sm text-destructive">{errors.languages.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-8 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="px-8"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="px-8"
+            >
+              Add Student
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

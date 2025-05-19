@@ -1,7 +1,5 @@
 import { z } from "zod";
-
-// Define the available languages
-export const availableLanguages = ["english", "spanish", "french", "german"] as const;
+import { availableLanguages } from "./languages"; // Import available languages
 
 // Create a Zod schema for student validation
 export const studentSchema = z.object({
