@@ -200,7 +200,26 @@ export function Student4AdminForm({ onSubmit, isOpen, onClose }: StudentFormProp
             </FormSection>
           </div>
 
-          <FormActions onClose={onClose} />
+          <div className="flex justify-end space-x-8 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="px-8"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="px-8"
+              onClick={() => {
+                console.log('Submit button clicked');
+                handleSubmit(onFormSubmit)();
+              }}
+            >
+              Add Student
+            </Button>
+          </div>
         </form>
       </div>
     </div>

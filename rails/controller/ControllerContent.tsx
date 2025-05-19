@@ -224,6 +224,19 @@ export function ControllerContent({
     }
   };
 
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'j') {
+        event.preventDefault();
+        handleAddNew();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [showAddForm]); // Re-run when showAddForm changes
+
   const tableProps: GenericTableProps = {
     fields,
     data: filteredData
@@ -282,7 +295,7 @@ export function ControllerContent({
         totalItems={filteredData.length}
         onAddNew={handleAddNew}
         showAddButton={showAddButton}
-        addButtonText={`Add ${title}`}
+        addButtonText={showAddForm ? `Close ${title}` : `Add ${title}`}
       />
       
       {/* Add Form when showing */}
@@ -307,7 +320,7 @@ export function ControllerContent({
           {/* Render the form with props */}
           {React.createElement(addForm, {
             onSubmit: handleFormSubmit,
-            isOpen: showAddForm,
+            isOpen: true,
             onClose: () => setShowAddForm(false)
           })}
         </div>
