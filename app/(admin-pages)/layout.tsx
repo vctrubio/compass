@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           {/* <AdminHeader /> */}
           <NavAdmin />
           <div className="mt-8">
-            <DashboardBanner />
+            {/* <DashboardBanner /> */}
             <div className="mt-6">
               {children}
             </div>

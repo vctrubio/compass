@@ -1,58 +1,70 @@
 import { TableField } from "@/rails/types";
-import { GenericRow } from "./GenericRow";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-export interface GenericTableProps {
+interface GenericTableProps {
+  table: {
     fields: TableField[];
     data: any[];
+  };
 }
 
-export function GenericTable({ table }: { table: GenericTableProps }) {
-    if (!table || !table.fields || !table.data) {
-        return <div className="text-sm text-muted-foreground p-4 rounded-md bg-muted/10">No table data available</div>;
-    }
+export function GenericTable({ table }: GenericTableProps) {
+  const pathname = usePathname();
 
-    if (table.data.length === 0) {
-        return (
-            <div className="text-center p-8 border rounded-md bg-background">
-                <p className="text-muted-foreground">No data to display</p>
-            </div>
-        );
-    }
+  if (!table || !table.fields || !table.data) {
+    return <div className="text-sm text-muted-foreground p-4 rounded-md bg-muted/10">No table data available</div>;
+  }
 
-    const TableHeader = () => (
-        <thead className="bg-muted/50">
-            <tr>
-                {table.fields.map((field, index) => (
-                    <th
-                        key={index}
-                        className="text-left font-medium text-muted-foreground p-3 text-sm"
-                    >
-                        {field.name}
-                    </th>
-                ))}
-            </tr>
-        </thead>
-    );
-
-    const TableBody = () => (
-        <tbody>
-            {table.data.map((row, rowIndex) => (
-                <GenericRow
-                    key={rowIndex}
-                    row={row}
-                    fields={table.fields}
-                    rowIndex={rowIndex}
-                />
-            ))}
-        </tbody>
-    );
-
+  if (table.data.length === 0) {
     return (
-        <div className="w-full overflow-auto">
-            <table className="w-full table-auto border-collapse border rounded-md">
-                <TableHeader />
-                <TableBody />
-            </table>
-        </div>
+      <div className="text-center p-8 border rounded-md bg-background">
+        <p className="text-muted-foreground">No data to display</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="w-full overflow-auto">
+      <table className="w-full table-auto border-collapse border rounded-md">
+        <thead className="bg-muted/50">
+          <tr>
+            {table.fields.map((field, index) => (
+              <th
+                key={index}
+                className="text-left font-medium text-muted-foreground p-3 text-sm"
+              >
+                {field.name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.data.map((row, rowIndex) => (
+            <tr key={rowIndex} className="border-b">
+              {table.fields.map((field) => (
+                <td
+                  key={field.name}
+                  className="p-3 text-sm"
+                >
+                  {field.name === "id" ? (
+                    <Link
+                      href={`${pathname}/${row[field.name]}`}
+                      className="text-primary hover:text-primary/80"
+                    >
+                      {row[field.name]}
+                    </Link>
+                  ) : (
+                    Array.isArray(row[field.name])
+                      ? row[field.name].join(", ")
+                      : String(row[field.name])
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
