@@ -9,8 +9,16 @@ export default function StudentsPage() {
   const { tables } = useAdminContext();
   const studentsTable = tables.students;
 
-  const handleStudentSubmit = (data: Student) => {
-    console.log("Hello world, this is a submit button test with form data:", data);
+  const handleStudentSubmit = async (data: Student): Promise<boolean> => {
+    try {
+      console.log("Hello world, this is a submit button test with form data:", data);
+      // Here you would typically make an API call
+      // For now, we'll just return true to simulate success
+      return true;
+    } catch (error) {
+      console.error("Error submitting student:", error);
+      return false;
+    }
   };
 
   if (!studentsTable) {

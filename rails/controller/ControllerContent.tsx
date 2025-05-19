@@ -301,21 +301,6 @@ export function ControllerContent({
       {/* Add Form when showing */}
       {addForm && showAddForm && (
         <div className="mb-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="keepFormOpen"
-                checked={keepFormOpen}
-                onCheckedChange={() => setKeepFormOpen(!keepFormOpen)}
-              />
-              <label
-                htmlFor="keepFormOpen"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Keep form open after submission
-              </label>
-            </div>
-          </div>
           
           {/* Render the form with props */}
           {React.createElement(addForm, {
