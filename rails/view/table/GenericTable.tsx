@@ -1,5 +1,4 @@
 import { TableField } from "@/rails/types";
-import { cn } from "@/lib/twMerge";
 import { GenericRow } from "./GenericRow";
 
 export interface GenericTableProps {
