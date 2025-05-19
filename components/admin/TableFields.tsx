@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react';
-import { DbTable } from '@/utils/context/db-context';
+import { DbTable } from '@/utils/context-oldbutgold/db-context';
 import { DataCard, DataItem } from '@/components/ui/data-rows';
 
 interface TableFieldsProps {

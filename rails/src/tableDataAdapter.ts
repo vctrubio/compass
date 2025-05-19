@@ -22,30 +22,28 @@ export function createTableData(tableName: string, adminTable: any): TableEntity
     sortBy: adminTable.sortBy || tableInfo?.sortBy || [],
     relationship: adminTable.relationship || tableInfo?.relationship || [],
     desc: adminTable.desc || tableInfo?.desc || `${tableName} table`,
-    api: {
+    api: adminTable.api || {
+      // Fallback if the API is not provided (should not happen in production)
       get: async () => adminTable.data || [],
       getId: async (id: string | number) => {
         const idStr = String(id);
         return adminTable.data?.find((item: any) => String(item.id) === idStr) || null;
       },
-      put: async (data: any) => ({ data, error: null }),
-      updateId: async (id: string | number, data: any) => ({ success: true, error: null }),
-      deleteId: async (id: string | number) => ({ success: true, error: null })
+      put: async (data: any) => {
+        console.warn(`Mock API used for ${tableName}.put() - no actual database operation performed`);
+        return { data, error: null };
+      },
+      updateId: async (id: string | number, data: any) => {
+        console.warn(`Mock API used for ${tableName}.updateId() - no actual database operation performed`);
+        return { success: true, error: null };
+      },
+      deleteId: async (id: string | number) => {
+        console.warn(`Mock API used for ${tableName}.deleteId() - no actual database operation performed`);
+        return { success: true, error: null };
+      }
     }
   };
   
   return tableData;
 }
 
-/**
- * Get appropriate search fields for a table based on its schema
- */
-export function getDefaultSearchFields(fields: any[]): string[] {
-  const searchableFields = fields.filter(field => 
-    field.type === 'string' && 
-    !field.isPrimaryKey &&
-    ['name', 'title', 'description', 'email', 'phone', 'first_name', 'last_name'].includes(field.name)
-  ).map(field => field.name);
-  
-  return searchableFields.length ? searchableFields : ['name'];
-}

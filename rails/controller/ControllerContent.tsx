@@ -241,7 +241,7 @@ export function ControllerContent({
         activeSort={activeSort}
         totalItems={filteredData.length}
         onAddNew={handleAddNew}
-        showAddButton={showAddButton}
+        showAddButton={addForm !== undefined && showAddButton}
         addButtonText={showAddForm ? `Close ${title}` : `Add ${title}`}
       />
 
@@ -251,18 +251,25 @@ export function ControllerContent({
           {React.createElement(addForm, {
             onSubmit: async (data: any) => {
               try {
+                console.log(`[${tableName}] Submitting form data:`, data);
+                
                 if (!tableData?.api?.put) {
+                  console.error(`[${tableName}] Table API not configured:`, tableData?.api);
                   throw new Error("Table API not properly configured");
                 }
+                
+                console.log(`[${tableName}] Calling API.put with data:`, data);
                 const result = await tableData.api.put(data);
+                console.log(`[${tableName}] API response:`, result);
+                
                 if (result) {
-                  // setAllData(prev => [...prev, result]);
-                  setShowAddForm(false);
+                  console.log(`[${tableName}] Form submission successful, not adding data, should listen to new change`);
                   return true;
                 }
+                console.log(`[${tableName}] Form submission failed, result:`, result);
                 return false;
               } catch (err) {
-                console.error("Error adding item:", err);
+                console.error(`[${tableName}] Error adding item:`, err);
                 return false;
               }
             },

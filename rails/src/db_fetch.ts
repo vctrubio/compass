@@ -13,7 +13,6 @@ const fetchTableDataRaw = async (
   client: SupabaseClient,
   tableName: string
 ): Promise<any> => {
-
   try {
     if (!ALL_TABLE_NAMES.includes(tableName as any)) {
       throw new Error(`Table "${tableName}" is not in the allowed tables list`);
@@ -27,7 +26,9 @@ const fetchTableDataRaw = async (
       throw error;
     }
 
-    console.log(`✅ DB_FETCH: Successfully fetched ${data?.length || 0} rows from ${tableName}`);
+    console.log(
+      `✅ DB_FETCH: Successfully fetched ${data?.length || 0} rows from ${tableName}`
+    );
     return data || [];
   } catch (error) {
     console.error(`❌ DB_FETCH: Error fetching data from ${tableName}:`, error);
@@ -45,7 +46,9 @@ export const fetchTablesDataFromDb = async (
   client: SupabaseClient,
   tableNames: string[]
 ): Promise<Record<string, TableEntity>> => {
-  console.log(`🔄 DB_FETCH: Starting fetch for tables: ${tableNames.join(", ")}`);
+  console.log(
+    `🔄 DB_FETCH: Starting fetch for tables: ${tableNames.join(", ")}`
+  );
   return await initializeTables(client, tableNames);
 };
 
@@ -73,7 +76,7 @@ export const initializeTables = async (
       const { data, error } = await client
         .from(tableName)
         .select()
-        .eq('id', id)
+        .eq("id", id)
         .single();
       if (error) throw error;
       return data;
@@ -90,16 +93,13 @@ export const initializeTables = async (
       const { data: result, error } = await client
         .from(tableName)
         .update(data)
-        .eq('id', id)
+        .eq("id", id)
         .select();
       if (error) throw error;
       return result;
     },
     deleteId: async (id: string | number) => {
-      const { error } = await client
-        .from(tableName)
-        .delete()
-        .eq('id', id);
+      const { error } = await client.from(tableName).delete().eq("id", id);
       if (error) throw error;
       return true;
     },
@@ -114,21 +114,16 @@ export const initializeTables = async (
     try {
       tableData = await fetchTableDataRaw(client, tableName);
     } catch (error) {
-      console.error(`❌ DB_FETCH: Error fetching data for table ${tableName}:`, error);
+      console.error(
+        `❌ DB_FETCH: Error fetching data for table ${tableName}:`,
+        error
+      );
     }
 
     // Create the table entity using available data
     tables[tableName] = {
       name: tableName,
-      fields: tableDictInfo?.fields || 
-        (tableData && tableData.length > 0
-          ? Object.keys(tableData[0]).map((key) => ({
-              name: key,
-              type: typeof tableData[0][key],
-              required: false,
-              isPrimaryKey: false,
-            }))
-          : []),
+      fields: tableDictInfo?.fields || [],
       data: tableData || [],
       api: createTableApi(tableName),
       relationship: tableDictInfo?.relationship || [],
@@ -138,6 +133,8 @@ export const initializeTables = async (
     console.log(`✅ DB_FETCH: Successfully initialized table: ${tableName}`);
   }
 
-  console.log(`✅ DB_FETCH: Completed initialization of ${Object.keys(tables).length} tables`);
+  console.log(
+    `✅ DB_FETCH: Completed initialization of ${Object.keys(tables).length} tables`
+  );
   return tables;
 };

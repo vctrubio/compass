@@ -6,7 +6,6 @@ import { ADMIN_TABLE_NAMES } from '@/rails/routes';
 
 // Extend the RailsContextType with admin-specific properties
 interface AdminContextType extends RailsContextType {
-  isAdmin: boolean;
 }
 
 // Define the AdminProvider component that wraps RailsProvider
@@ -26,26 +25,24 @@ const AdminProviderInner = ({ children }: { children: React.ReactNode }) => {
   // Get the base context from RailsProvider
   const railsContext = useRailsContext();
   const tablesToFetch = [...ADMIN_TABLE_NAMES];
-  
+
   // Add admin-specific state
-  const [isAdmin] = useState<boolean>(true);
   const { user, isLoading, fetchTables } = railsContext;
-  
+
   // Use ref to track if tables have been fetched
   const tablesLoadedRef = useRef(false);
-  
+
   // Fetch admin-specific tables data only once
   useEffect(() => {
     console.log('👑 AdminProvider: Checking conditions for table fetch:', {
       hasUser: !!user,
       isLoading,
-      isAdmin,
       tablesLoaded: tablesLoadedRef.current
     });
 
-    if (user && !isLoading && isAdmin && !tablesLoadedRef.current) {
+    if (user && !isLoading && !tablesLoadedRef.current) {
       console.log('👑 AdminProvider: Starting admin table fetch');
-      
+
       const fetchAdminTables = async () => {
         try {
           console.log('👑 AdminProvider: Fetching admin tables:', tablesToFetch);
@@ -56,22 +53,19 @@ const AdminProviderInner = ({ children }: { children: React.ReactNode }) => {
           console.error("❌ AdminProvider: Error fetching admin tables:", error);
         }
       };
-      
+
       // Execute the fetch function
       fetchAdminTables();
     }
-  }, [user, isLoading, isAdmin, fetchTables, tablesToFetch]);
-  
+  }, [user, isLoading,  fetchTables, tablesToFetch]);
+
   // Only access window in client components and when it's available
-  if (typeof window !== 'undefined') {
-    window.isadmin = isAdmin;
-  }
-  
+
+
   return (
-    <AdminContext.Provider value={{ 
+    <AdminContext.Provider value={{
       ...railsContext,
       listTables: tablesToFetch,
-      isAdmin,
     }}>
       {children}
     </AdminContext.Provider>

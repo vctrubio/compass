@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Save } from 'lucide-react';
-import { DbTable } from '@/utils/context/db-context';
+import { DbTable } from '@/utils/context-oldbutgold/db-context';
 
 interface EditRecordFormProps {
   table: DbTable;

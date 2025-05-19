@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { DbTable } from '@/utils/context/db-context';
+import { DbTable } from '@/utils/context-oldbutgold/db-context';
 
 interface AddRecordFormProps {
   table: DbTable;
