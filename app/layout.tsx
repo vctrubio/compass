@@ -1,4 +1,3 @@
-import DeployButton from "@/components/deploy-button";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
