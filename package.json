@@ -6,7 +6,8 @@
     "start": "next start",
     "db:push": "dotenv -e .env.local -- drizzle-kit push",
     "db:generate": "dotenv -e .env.local -- drizzle-kit generate",
-    "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate"
+    "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate",
+    "check:field-names": "node check-field-names.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

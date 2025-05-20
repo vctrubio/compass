@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller } from 'react-hook-form';
 import { teacherSchema, Teacher, defaultTeacher } from '@/rails/model/teacher';
 import { availableLanguages } from '@/rails/model/languages';
-import { FormStructure, FormProps } from './FormStructure';
+import { FormStructure, FormProps } from './AFormStructure';
 
 // Form Sections
 function PersonalInfoSection({ register, errors }: { register: any; errors: any }) {

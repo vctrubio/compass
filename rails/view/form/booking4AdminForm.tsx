@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormStructure } from './FormStructure';
+import { FormStructure } from './AFormStructure';
 import { bookingSchema, Booking, defaultBooking } from '@/rails/model/booking';
 import { useAdminContext } from "@/rails/provider/admin-context-provider";
-import { formatDateForInput } from "@/rails/src/formatters";
+import { formatDateForInput } from "@/rails/src/dateFormatter";
 
 // Form Sections
 function BookingDetailsSection({ 
@@ -21,10 +21,10 @@ function BookingDetailsSection({
   return (
     <FormStructure.Section title="Booking Details">
       <div className="flex flex-col gap-3 w-full">
-        <FormStructure.Field label="Package *" id="packageId" error={errors.packageId?.message}>
+        <FormStructure.Field label="Package *" id="package_id" error={errors.package_id?.message}>
           <select
-            id="packageId"
-            {...register('packageId', {
+            id="package_id"
+            {...register('package_id', {
               required: "Package is required",
               valueAsNumber: true
             })}
@@ -39,10 +39,10 @@ function BookingDetailsSection({
           </select>
         </FormStructure.Field>
 
-        <FormStructure.Field label="Student *" id="studentId" error={errors.studentId?.message}>
+        <FormStructure.Field label="Student *" id="student_id" error={errors.student_id?.message}>
           <select
-            id="studentId"
-            {...register('studentId', {
+            id="student_id"
+            {...register('student_id', {
               required: "Student is required",
               valueAsNumber: true
             })}
@@ -57,13 +57,12 @@ function BookingDetailsSection({
           </select>
         </FormStructure.Field>
 
-        <FormStructure.Field label="Start Date *" id="startDate" error={errors.startDate?.message}>
+        <FormStructure.Field label="Start Date *" id="start_date" error={errors.start_date?.message}>
           <Input
-            id="startDate"
+            id="start_date"
             type="date"
-            {...register('startDate', {
-              required: "Start date is required",
-              setValueAs: (value: string) => value ? new Date(value) : null
+            {...register('start_date', {
+              required: "Start date is required"
             })}
             className="w-full"
           />
@@ -78,8 +77,8 @@ export function Booking4AdminForm({
   onSubmit, 
   isOpen, 
   onClose,
-  students = [],
-  packages = []
+  students: propStudents,
+  packages: propPackages
 }: { 
   onSubmit: (data: Booking) => Promise<boolean>; 
   isOpen: boolean; 
@@ -87,25 +86,47 @@ export function Booking4AdminForm({
   students?: any[];
   packages?: any[];
 }) {
+  const { tables } = useAdminContext();
+  const [studentsData, setStudentsData] = useState<any[]>([]);
+  const [packagesData, setPackagesData] = useState<any[]>([]);
+  
+  // Use the tables from context or props, prioritizing context if available
+  useEffect(() => {
+    // Get students data - first try from context, then fall back to props
+    if (tables?.students?.data) {
+      setStudentsData(tables.students.data);
+    } else if (propStudents && propStudents.length > 0) {
+      setStudentsData(propStudents);
+    }
+    
+    // Get packages data - first try from context, then fall back to props
+    if (tables?.packages?.data) {
+      setPackagesData(tables.packages.data);
+    } else if (propPackages && propPackages.length > 0) {
+      setPackagesData(propPackages);
+    }
+  }, [tables, propStudents, propPackages]);
+
   // This will be to apply logic when picking
   const renderPackages = (packages: any[]) => {
     // Here we can apply additional logic, filtering, or sorting when needed
-    return packages;
+    // For example, sort by price
+    return [...packages].sort((a, b) => a.price - b.price);
   };
 
   // This will be to apply logic when picking
   const renderStudents = (students: any[]) => {
     // Here we can apply additional logic, filtering, or sorting when needed
-    return students;
+    // For example, sort alphabetically by name
+    return [...students].sort((a, b) => a.name.localeCompare(b.name));
   };
 
-  const processedPackages = renderPackages(packages);
-  const processedStudents = renderStudents(students);
+  const processedPackages = renderPackages(packagesData);
+  const processedStudents = renderStudents(studentsData);
 
-  // Initialize with default booking values, but use the string format for the date input
+  // Initialize with default booking values
   const formDefaultValues = {
-    ...defaultBooking,
-    startDate: defaultBooking.startDate
+    ...defaultBooking
   };
 
   return (

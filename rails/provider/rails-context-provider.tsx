@@ -131,6 +131,8 @@ const RailsProvider = ({ children }: { children: React.ReactNode }) => {
         supabaseClient: supabase,
     };
 
+  window.ptr = tables;
+
     return (
         <RailsContext.Provider value={contextValue}>
             {children}

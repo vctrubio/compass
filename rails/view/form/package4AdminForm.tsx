@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { packageSchema, Package, defaultPackage } from '@/rails/model/package';
-import { FormStructure, FormProps } from './FormStructure';
+import { FormStructure, FormProps } from './AFormStructure';
 
 // Form Sections
 function PackageDetailsSection({ register, errors }: { register: any; errors: any }) {

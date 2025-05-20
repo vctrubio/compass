@@ -1,0 +1,7 @@
+[] migration of gookint table: package.capacity must = student_id 
+    student_id to be an array. and if student is not included. include guest:student: create a student on the fly and link to another student - relationshiup needed
+
+[] welcome table. 
+    -we see who the student comes from, student or teacher ect.
+    -we ask them to fill a form for passport, weight and anything else.
+    -we store that id into the student's table

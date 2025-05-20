@@ -3,13 +3,12 @@ import React from 'react';
 import { useAdminContext } from "@/rails/provider/admin-context-provider";
 import { ControllerContent } from '@/rails/controller/ControllerContent';
 import { Booking4AdminForm } from '@/rails/view/form/booking4AdminForm';
+import { bookingFieldMappings } from '@/rails/src/mapping';
 
 export default function BookingsPage() {
   const { tables } = useAdminContext();
   const bookingsTable = tables.bookings;
-  const students = tables.students?.data || [];
-  const packages = tables.packages?.data || [];
-
+  
   if (!bookingsTable) {
     return <div>No table found</div>;
   }
@@ -19,12 +18,14 @@ export default function BookingsPage() {
       title="Bookings"
       tableName="bookings"
       tableData={bookingsTable}
-      searchFields={['studentId']}
+      searchFields={['student_id']}
+      fieldMappings={bookingFieldMappings}
+      // No need to pass allTables as GenericTable will use the context
       addForm={(props) => (
         <Booking4AdminForm
           {...props}
-          students={students}
-          packages={packages}
+          // No need to pass students and packages explicitly now
+          // The form will get them from the context
         />
       )}
     />

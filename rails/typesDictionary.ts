@@ -43,7 +43,7 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'email', type: 'string', required: false, isPrimaryKey: false },
       { name: 'phone', type: 'string', required: false, isPrimaryKey: false },
       { name: 'languages', type: 'array', required: true, isPrimaryKey: false },
-      { name: 'authId', type: 'string', required: false, isPrimaryKey: false }
+      { name: 'auth_id', type: 'string', required: false, isPrimaryKey: false }
     ],
     relationship: ["lessons"],
     desc: "Teachers table - contains teacher profiles and their information",
@@ -130,7 +130,7 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     relationship: ["lessons", "packages", "students"],
     desc: "Bookings table - contains student bookings for lesson packages",
     filterBy: [
-      { field: 'startDate', label: 'Time Period', options: [
+      { field: 'start_date', label: 'Time Period', options: [
         { value: 'today', label: 'Today' },
         { value: 'this-week', label: 'This Week' },
         { value: 'this-month', label: 'This Month' },
@@ -138,10 +138,10 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       ]}
     ],
     sortBy: [
-      { field: 'startDate', label: 'Date (Newest First)', direction: 'desc' },
-      { field: 'startDate', label: 'Date (Oldest First)', direction: 'asc' },
-      { field: 'createdAt', label: 'Booking Date (Newest First)', direction: 'desc' },
-      { field: 'createdAt', label: 'Booking Date (Oldest First)', direction: 'asc' }
+      { field: 'start_date', label: 'Date (Newest First)', direction: 'desc' },
+      { field: 'start_date', label: 'Date (Oldest First)', direction: 'asc' },
+      { field: 'created_at', label: 'Booking Date (Newest First)', direction: 'desc' },
+      { field: 'created_at', label: 'Booking Date (Oldest First)', direction: 'asc' }
     ]
   },
   
@@ -149,8 +149,8 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "sessions",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'equipmentIds', type: 'array', required: true, isPrimaryKey: false },
-      { name: 'startTime', type: 'date', required: true, isPrimaryKey: false },
+      { name: 'equipment_ids', type: 'array', required: true, isPrimaryKey: false },
+      { name: 'start_time', type: 'string', required: true, isPrimaryKey: false },
       { name: 'duration', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessonSessions"],
@@ -161,15 +161,15 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
         { value: 120, label: '2 Hours' },
         { value: 180, label: '3+ Hours' }
       ]},
-      { field: 'startTime', label: 'Time', options: [
+      { field: 'start_time', label: 'Time', options: [
         { value: 'morning', label: 'Morning (Before 12pm)' },
         { value: 'afternoon', label: 'Afternoon (12-4pm)' },
         { value: 'evening', label: 'Evening (After 4pm)' }
       ]}
     ],
     sortBy: [
-      { field: 'startTime', label: 'Start Time (Newest First)', direction: 'desc' },
-      { field: 'startTime', label: 'Start Time (Oldest First)', direction: 'asc' },
+      { field: 'start_time', label: 'Start Time (Newest First)', direction: 'desc' },
+      { field: 'start_time', label: 'Start Time (Oldest First)', direction: 'asc' },
       { field: 'duration', label: 'Duration (Short to Long)', direction: 'asc' },
       { field: 'duration', label: 'Duration (Long to Short)', direction: 'desc' }
     ]
@@ -180,7 +180,7 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
       { name: 'cash', type: 'boolean', required: true, isPrimaryKey: false },
-      { name: 'createdDate', type: 'date', required: true, isPrimaryKey: false },
+      { name: 'created_at', type: 'string', required: true, isPrimaryKey: false },
       { name: 'amount', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessons"],
@@ -192,8 +192,8 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       ]}
     ],
     sortBy: [
-      { field: 'createdDate', label: 'Date (Newest First)', direction: 'desc' },
-      { field: 'createdDate', label: 'Date (Oldest First)', direction: 'asc' },
+      { field: 'created_at', label: 'Date (Newest First)', direction: 'desc' },
+      { field: 'created_at', label: 'Date (Oldest First)', direction: 'asc' },
       { field: 'amount', label: 'Amount (High to Low)', direction: 'desc' },
       { field: 'amount', label: 'Amount (Low to High)', direction: 'asc' }
     ]
@@ -203,12 +203,12 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "post_lessons",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'studentConfirmation', type: 'boolean', required: true, isPrimaryKey: false }
+      { name: 'student_confirmation', type: 'boolean', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessons"],
     desc: "Post-lessons table - contains post-lesson feedback and confirmations",
     filterBy: [
-      { field: 'studentConfirmation', label: 'Confirmation', options: [
+      { field: 'student_confirmation', label: 'Confirmation', options: [
         { value: 'true', label: 'Confirmed' },
         { value: 'false', label: 'Not Confirmed' }
       ]}
@@ -220,21 +220,21 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "availability_windows",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'startDate', type: 'date', required: true, isPrimaryKey: false },
-      { name: 'endDate', type: 'date', required: true, isPrimaryKey: false },
-      { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
+      { name: 'start_date', type: 'string', required: true, isPrimaryKey: false },
+      { name: 'end_date', type: 'string', required: true, isPrimaryKey: false },
+      { name: 'created_at', type: 'string', required: false, isPrimaryKey: false }
     ],
     relationship: ["studentAvailabilityWindows"],
     desc: "Availability windows table - contains time periods for scheduling",
     filterBy: [
-      { field: 'startDate', label: 'Period', options: [
+      { field: 'start_date', label: 'Period', options: [
         { value: 'upcoming', label: 'Upcoming' },
         { value: 'past', label: 'Past' }
       ]}
     ],
     sortBy: [
-      { field: 'startDate', label: 'Start Date (Newest First)', direction: 'desc' },
-      { field: 'startDate', label: 'Start Date (Oldest First)', direction: 'asc' }
+      { field: 'start_date', label: 'Start Date (Newest First)', direction: 'desc' },
+      { field: 'start_date', label: 'Start Date (Oldest First)', direction: 'asc' }
     ]
   },
   
@@ -242,8 +242,8 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "student_availability_windows",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'studentId', type: 'number', required: true, isPrimaryKey: false },
-      { name: 'availabilityWindowId', type: 'number', required: true, isPrimaryKey: false }
+      { name: 'student_id', type: 'number', required: true, isPrimaryKey: false },
+      { name: 'availability_window_id', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["students", "availabilityWindows"],
     desc: "Student availability windows table - links students to their availability",
@@ -255,12 +255,12 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "lessons",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'teacherId', type: 'number', required: true, isPrimaryKey: false },
-      { name: 'bookingId', type: 'number', required: true, isPrimaryKey: false },
-      { name: 'paymentId', type: 'number', required: false, isPrimaryKey: false },
-      { name: 'postLessonId', type: 'number', required: false, isPrimaryKey: false },
+      { name: 'teacher_id', type: 'number', required: true, isPrimaryKey: false },
+      { name: 'booking_id', type: 'number', required: true, isPrimaryKey: false },
+      { name: 'payment_id', type: 'number', required: false, isPrimaryKey: false },
+      { name: 'post_lesson_id', type: 'number', required: false, isPrimaryKey: false },
       { name: 'status', type: 'string', required: true, isPrimaryKey: false },
-      { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
+      { name: 'created_at', type: 'date', required: false, isPrimaryKey: false }
     ],
     relationship: ["teachers", "bookings", "payments", "postLessons", "lessonSessions"],
     desc: "Lessons table - contains lesson records connecting teachers, bookings and sessions",
@@ -272,8 +272,8 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       ]}
     ],
     sortBy: [
-      { field: 'createdAt', label: 'Created Date (Newest First)', direction: 'desc' },
-      { field: 'createdAt', label: 'Created Date (Oldest First)', direction: 'asc' },
+      { field: 'created_at', label: 'Created Date (Newest First)', direction: 'desc' },
+      { field: 'created_at', label: 'Created Date (Oldest First)', direction: 'asc' },
       { field: 'status', label: 'Status (A-Z)', direction: 'asc' }
     ]
   },
@@ -282,8 +282,8 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "lesson_sessions",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'lessonId', type: 'number', required: true, isPrimaryKey: false },
-      { name: 'sessionId', type: 'number', required: true, isPrimaryKey: false }
+      { name: 'lesson_id', type: 'number', required: true, isPrimaryKey: false },
+      { name: 'session_id', type: 'number', required: true, isPrimaryKey: false }
     ],
     relationship: ["lessons", "sessions"],
     desc: "Lesson sessions table - links lessons to their individual sessions",
@@ -295,7 +295,7 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "admins",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'userId', type: 'string', required: true, isPrimaryKey: false },
+      { name: 'user_id', type: 'string', required: true, isPrimaryKey: false },
       { name: 'role', type: 'string', required: true, isPrimaryKey: false }
     ],
     relationship: [],

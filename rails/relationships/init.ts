@@ -9,9 +9,9 @@ const studentViewFields = [
 
 const teacherViewFields = ["name", "language", "lessonsId", "sessionsId"];
 
-const bookingViewFields = ["studentId", "startDate"];
+const bookingViewFields = ["student_id", "start_date"];
 
-const lessonViewFields = ["teacherId", "studentId", "status"];
+const lessonViewFields = ["teacher_id", "student_id", "status"];
 
 //thi is jsut an init file
 // idea here is to declare what relationshships are important when we render teh model/id page to give good feecback to the user

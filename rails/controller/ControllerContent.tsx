@@ -4,6 +4,7 @@ import { ControllerBar } from "./ControllerBar";
 import { GenericTable } from "@/rails/view/table/GenericTable";
 import { SortOption, TableEntity } from "@/rails/types";
 import { dbTableDictionary } from "@/rails/typesDictionary";
+import { FieldMapping } from "@/rails/src/mapping";
 
 export interface FilterValue {
   field: string;
@@ -25,6 +26,8 @@ export interface ControllerContentProps {
   showAddButton?: boolean;
   children?: ReactNode;
   addForm?: React.ComponentType<FormProps>;
+  fieldMappings?: FieldMapping[]; // Optional field mappings for resolving relations
+  allTables?: Record<string, TableEntity>; // All tables data for relation lookups
 }
 
 export function ControllerContent({
@@ -34,7 +37,9 @@ export function ControllerContent({
   searchFields = ['name', 'first_name', 'last_name'],
   showAddButton = true,
   children,
-  addForm
+  addForm,
+  fieldMappings,
+  allTables
 }: ControllerContentProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [allData, setAllData] = useState<any[]>([]);
@@ -283,7 +288,16 @@ export function ControllerContent({
       {children}
 
       {/* Default table if no custom content is provided */}
-      {!children && <GenericTable table={{ fields, data: filteredData }} />}
+      {!children && <GenericTable 
+        table={{ 
+          fields, 
+          data: filteredData,
+          name: tableName 
+        }} 
+        fieldMappings={fieldMappings}
+        tableName={tableName}
+        // The GenericTable will use the context if allTables isn't provided
+      />}
     </div>
   );
 }

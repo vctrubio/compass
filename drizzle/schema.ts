@@ -1,3 +1,6 @@
+// Database schema definition using snake_case for all field names
+// All column names and relation fields should use snake_case (e.g., user_id, start_date)
+// This ensures consistency between the database and application code
 import {
   pgTable,
   serial,
@@ -31,9 +34,9 @@ const equipmentTypeEnum = pgEnum("equipment_type", ["kite", "bar", "board"]);
 // Date spans table to track availability
 export const availabilityWindows = pgTable("availability_windows", {
   id: serial("id").primaryKey(),
-  startDate: timestamp("start_date", { withTimezone: true }).notNull(),
-  endDate: timestamp("end_date", { withTimezone: true }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  start_date: timestamp("start_date", { withTimezone: true }).notNull(),
+  end_date: timestamp("end_date", { withTimezone: true }).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 // Junction table for students and availability windows
@@ -41,10 +44,10 @@ export const studentAvailabilityWindows = pgTable(
   "student_availability_windows",
   {
     id: serial("id").primaryKey(),
-    studentId: integer("student_id")
+    student_id: integer("student_id")
       .notNull()
       .references(() => students.id),
-    availabilityWindowId: integer("availability_window_id")
+    availability_window_id: integer("availability_window_id")
       .notNull()
       .references(() => availabilityWindows.id),
   }
@@ -58,7 +61,7 @@ export const students = pgTable("students", {
   phone: text("phone"),
   languages: languagesEnum("languages").array().notNull(),
   age: integer("age").notNull(),
-  authId: text("user_id"), // For (SUPERBASE) auth system integration
+  auth_id: text("user_id"), // For (SUPERBASE) auth system integration
 });
 
 export const teachers = pgTable("teachers", {
@@ -67,13 +70,13 @@ export const teachers = pgTable("teachers", {
   email: text("email"),
   phone: text("phone"),
   languages: languagesEnum("languages").array().notNull(),
-  authId: text("user_id"), // For (SUPERBASE) auth system integration
+  auth_id: text("user_id"), // For (SUPERBASE) auth system integration
 });
 
 //later be migrated to userAuthTable from auth system
 export const admins = pgTable("admins", {
   id: serial("id").primaryKey(),
-  userId: text("user_id").notNull(),
+  user_id: text("user_id").notNull(),
   role: text("role").notNull(),
 });
 
@@ -92,23 +95,23 @@ export const packages = pgTable("packages", {
   hours: integer("hours").notNull(),
   capacity: integer("capacity").notNull(),
   description: text("description"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 // Bookings table - now directly links to a student
 export const bookings = pgTable("bookings", {
   id: serial("id").primaryKey(),
-  packageId: integer("package_id").notNull().references(() => packages.id),
-  studentId: integer("student_id").notNull().references(() => students.id),
-  startDate: timestamp("start_date", { withTimezone: true }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  package_id: integer("package_id").notNull().references(() => packages.id),
+  student_id: integer("student_id").notNull().references(() => students.id),
+  start_date: timestamp("start_date", { withTimezone: true }).notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 // Equipment session table
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
-  equipmentIds: integer("equipment_ids").array().notNull(), // Array of equipment IDs
-  startTime: timestamp("start_time", { withTimezone: true }).notNull(), // Changed from date to startTime
+  equipment_ids: integer("equipment_ids").array().notNull(), // Array of equipment IDs
+  start_time: timestamp("start_time", { withTimezone: true }).notNull(), // Changed from date to start_time
   duration: integer("duration").notNull(), // In minutes
 });
 
@@ -116,32 +119,32 @@ export const sessions = pgTable("sessions", {
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
   cash: boolean("cash").notNull(), // If false, it's a bank transfer
-  createdDate: timestamp("created_date", { withTimezone: true }).notNull(), // Changed from date to createdDate
+  created_at: timestamp("created_at", { withTimezone: true }).notNull(), // Changed to consistent field name
   amount: integer("amount").notNull(), // In euros
 });
 
 // Post lesson feedback table - simplified
 export const postLessons = pgTable("post_lessons", {
   id: serial("id").primaryKey(),
-  studentConfirmation: boolean("student_confirmation").notNull(),
+  student_confirmation: boolean("student_confirmation").notNull(),
 });
 
 // Lesson table - combines everything
 export const lessons = pgTable("lessons", {
   id: serial("id").primaryKey(),
-  teacherId: integer("teacher_id").notNull().references(() => teachers.id),
-  bookingId: integer("booking_id").notNull().references(() => bookings.id),
-  paymentId: integer("payment_id").references(() => payments.id),
-  postLessonId: integer("post_lesson_id").references(() => postLessons.id),
+  teacher_id: integer("teacher_id").notNull().references(() => teachers.id),
+  booking_id: integer("booking_id").notNull().references(() => bookings.id),
+  payment_id: integer("payment_id").references(() => payments.id),
+  post_lesson_id: integer("post_lesson_id").references(() => postLessons.id),
   status: statusEnum("status").notNull().default("created"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 // Lesson to session many-to-many relation table
 export const lessonSessions = pgTable("lesson_sessions", {
   id: serial("id").primaryKey(),
-  lessonId: integer("lesson_id").notNull().references(() => lessons.id),
-  sessionId: integer("session_id").notNull().references(() => sessions.id),
+  lesson_id: integer("lesson_id").notNull().references(() => lessons.id),
+  session_id: integer("session_id").notNull().references(() => sessions.id),
 });
 
 // Define relationships
@@ -156,11 +159,11 @@ export const availabilityWindowsRelations = relations(availabilityWindows, ({ ma
 
 export const studentAvailabilityWindowsRelations = relations(studentAvailabilityWindows, ({ one }) => ({
   student: one(students, {
-    fields: [studentAvailabilityWindows.studentId],
+    fields: [studentAvailabilityWindows.student_id],
     references: [students.id],
   }),
   availabilityWindow: one(availabilityWindows, {
-    fields: [studentAvailabilityWindows.availabilityWindowId],
+    fields: [studentAvailabilityWindows.availability_window_id],
     references: [availabilityWindows.id],
   }),
 }));
@@ -175,11 +178,11 @@ export const packagesRelations = relations(packages, ({ many }) => ({
 
 export const bookingsRelations = relations(bookings, ({ one, many }) => ({
   package: one(packages, {
-    fields: [bookings.packageId],
+    fields: [bookings.package_id],
     references: [packages.id],
   }),
   student: one(students, {
-    fields: [bookings.studentId],
+    fields: [bookings.student_id],
     references: [students.id],
   }),
   lessons: many(lessons),
@@ -200,19 +203,19 @@ export const postLessonsRelations = relations(postLessons, ({ many }) => ({
 
 export const lessonsRelations = relations(lessons, ({ one, many }) => ({
   teacher: one(teachers, {
-    fields: [lessons.teacherId],
+    fields: [lessons.teacher_id],
     references: [teachers.id],
   }),
   booking: one(bookings, {
-    fields: [lessons.bookingId],
+    fields: [lessons.booking_id],
     references: [bookings.id],
   }),
   payment: one(payments, {
-    fields: [lessons.paymentId],
+    fields: [lessons.payment_id],
     references: [payments.id],
   }),
   postLesson: one(postLessons, {
-    fields: [lessons.postLessonId],
+    fields: [lessons.post_lesson_id],
     references: [postLessons.id],
   }),
   sessions: many(lessonSessions),
@@ -220,11 +223,11 @@ export const lessonsRelations = relations(lessons, ({ one, many }) => ({
 
 export const lessonSessionsRelations = relations(lessonSessions, ({ one }) => ({
   lesson: one(lessons, {
-    fields: [lessonSessions.lessonId],
+    fields: [lessonSessions.lesson_id],
     references: [lessons.id],
   }),
   session: one(sessions, {
-    fields: [lessonSessions.sessionId],
+    fields: [lessonSessions.session_id],
     references: [sessions.id],
   }),
 }));

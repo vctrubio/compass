@@ -5,10 +5,11 @@ export const lessonStatusValues = ["created", "confirmed", "cancelled", "complet
 
 // Create a Zod schema for lesson validation
 export const lessonSchema = z.object({
-  teacherId: z.number().int().positive({ message: "Teacher ID is required" }),
-  bookingId: z.number().int().positive({ message: "Booking ID is required" }),
-  paymentId: z.number().int().positive({ message: "Payment ID is required" }).optional().nullable(),
-  postLessonId: z.number().int().positive({ message: "Post Lesson ID is required" }).optional().nullable(),
+  id: z.number().optional(), // Add ID field for existing lessons
+  teacher_id: z.number().int().positive({ message: "Teacher ID is required" }),
+  booking_id: z.number().int().positive({ message: "Booking ID is required" }),
+  payment_id: z.number().int().positive({ message: "Payment ID is required" }).optional().nullable(),
+  post_lesson_id: z.number().int().positive({ message: "Post Lesson ID is required" }).optional().nullable(),
   status: z.enum(lessonStatusValues).default("created"),
 });
 
@@ -20,9 +21,9 @@ export type LessonStatus = z.infer<typeof lessonSchema>["status"];
 
 // Default lesson object
 export const defaultLesson: Lesson = {
-  teacherId: 0,
-  bookingId: 0,
-  paymentId: null,
-  postLessonId: null,
+  teacher_id: 0,
+  booking_id: 0,
+  payment_id: null,
+  post_lesson_id: null,
   status: "created",
 };
