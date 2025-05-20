@@ -19,5 +19,5 @@ export const defaultStudent: Student = {
   email: "",
   phone: "",
   languages: [],
-  age: 0,
+  age: 18,
 };

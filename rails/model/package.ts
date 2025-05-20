@@ -13,7 +13,7 @@ export type Package = z.infer<typeof packageSchema>;
 
 // Default package object
 export const defaultPackage: Package = {
-  price: 0,
+  price: 40,
   hours: 1,
   capacity: 1,
   description: ""
