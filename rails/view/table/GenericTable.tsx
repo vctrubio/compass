@@ -1,6 +1,7 @@
 import { TableField } from "@/rails/types";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { formatDate } from "@/rails/src/formatters";
 
 interface GenericTableProps {
   table: {
@@ -23,6 +24,8 @@ export function GenericTable({ table }: GenericTableProps) {
       </div>
     );
   }
+
+  console.log("Table data:", table.data);
 
   return (
     <div className="w-full overflow-auto">
@@ -54,6 +57,8 @@ export function GenericTable({ table }: GenericTableProps) {
                     >
                       {row[field.name]}
                     </Link>
+                  ) : field.type === 'date' ? (
+                    formatDate(row[field.name])
                   ) : (
                     Array.isArray(row[field.name])
                       ? row[field.name].join(", ")

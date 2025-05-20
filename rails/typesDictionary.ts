@@ -1,5 +1,6 @@
 import { TableField, TableEntity } from "@/rails/types";
 
+//its under_case in the schema ...
 export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'fields' | 'relationship' | 'desc' | 'filterBy' | 'sortBy'>> = {
   students: {
     name: "students",
@@ -10,7 +11,7 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'phone', type: 'string', required: false, isPrimaryKey: false },
       { name: 'languages', type: 'array', required: true, isPrimaryKey: false },
       { name: 'age', type: 'number', required: true, isPrimaryKey: false },
-      { name: 'authId', type: 'string', required: false, isPrimaryKey: false }
+      { name: 'auth_id', type: 'string', required: false, isPrimaryKey: false }
     ],
     relationship: ["bookings", "studentAvailabilityWindows"],
     desc: "Students table - contains student profiles and their information",
@@ -92,7 +93,7 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
       { name: 'hours', type: 'number', required: true, isPrimaryKey: false },
       { name: 'capacity', type: 'number', required: true, isPrimaryKey: false },
       { name: 'description', type: 'string', required: false, isPrimaryKey: false },
-      { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
+      { name: 'created_at', type: 'date', required: false, isPrimaryKey: false }
     ],
     relationship: ["bookings"],
     desc: "Packages table - contains lesson package offerings and pricing",
@@ -121,10 +122,10 @@ export const dbTableDictionary: Record<string, Pick<TableEntity, 'name' | 'field
     name: "bookings",
     fields: [
       { name: 'id', type: 'number', required: true, isPrimaryKey: true },
-      { name: 'packageId', type: 'number', required: true, isPrimaryKey: false },
-      { name: 'studentId', type: 'number', required: true, isPrimaryKey: false },
-      { name: 'startDate', type: 'date', required: true, isPrimaryKey: false },
-      { name: 'createdAt', type: 'date', required: false, isPrimaryKey: false }
+      { name: 'package_id', type: 'number', required: true, isPrimaryKey: false },
+      { name: 'student_id', type: 'number', required: true, isPrimaryKey: false },
+      { name: 'start_date', type: 'date', required: true, isPrimaryKey: false },
+      { name: 'created_at', type: 'date', required: false, isPrimaryKey: false }
     ],
     relationship: ["lessons", "packages", "students"],
     desc: "Bookings table - contains student bookings for lesson packages",

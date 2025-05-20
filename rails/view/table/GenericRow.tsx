@@ -1,5 +1,6 @@
 import React from 'react';
 import { TableField } from "@/rails/types";
+import { formatDate } from "@/rails/src/formatters";
 
 interface GenericRowProps {
     row: any;
@@ -13,6 +14,11 @@ export function GenericRow({ row, fields, rowIndex }: GenericRowProps) {
         // Handle null or undefined
         if (value === null || value === undefined) {
             return <span className="text-muted-foreground italic text-xs">N/A</span>;
+        }
+        
+        // Handle date fields
+        if (field.type === 'date') {
+            return formatDate(value);
         }
         
         // Handle arrays (like languages)
