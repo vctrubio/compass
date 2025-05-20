@@ -2,6 +2,8 @@
 import React from "react";
 import { useAdminContext } from "@/rails/provider/admin-context-provider";
 import { ControllerContent } from "@/rails/controller/ControllerContent";
+import { Session4AdminForm } from "@/rails/view/form/session4AdminForm";
+import { sessionFieldMappings } from "@/rails/src/mapping";
 
 export default function SessionsPage() {
   const { tables } = useAdminContext();
@@ -15,9 +17,14 @@ export default function SessionsPage() {
     <ControllerContent
       title="Sessions"
       tableName="sessions"
-      tableData={sessionsTable} // Use the table data directly from context
-      searchFields={["startTime"]} // Or other relevant fields for sessions
-      // addForm={SessionForm} // If you have a specific form for adding sessions
+      tableData={sessionsTable}
+      searchFields={["start_time", "duration"]}
+      fieldMappings={sessionFieldMappings}
+      addForm={(props) => (
+        <Session4AdminForm
+          {...props}
+        />
+      )}
     />
   );
 }

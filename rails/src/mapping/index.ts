@@ -10,3 +10,4 @@ export * from './teacherMapping';
 export * from './lessonMapping';
 export * from './enhancedLessonMapping';
 export * from './bookingForLessonMapping';
+export * from './sessionMapping';
